@@ -4,11 +4,15 @@ import './index.css'
 import App from './App.jsx'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 
-const clientId = "275707803562-8gdalgbaan6ka0h1tcscbl54k60303qi.apps.googleusercontent.com";
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+if (!clientId) {
+  console.warn("Missing VITE_GOOGLE_CLIENT_ID environment variable");
+}
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId={clientId}>
+    <GoogleOAuthProvider clientId={clientId || "missing-client-id"}>
       <App />
     </GoogleOAuthProvider>
   </StrictMode>,
