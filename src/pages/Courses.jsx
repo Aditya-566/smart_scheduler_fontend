@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import api from '../services/api';
+
 import { BookOpen, Search, Plus, MapPin, Edit, Trash2 } from 'lucide-react';
 
 export default function Courses() {

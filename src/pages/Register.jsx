@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserPlus, Mail, Lock, User } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 
 export default function Register() {
     const [formData, setFormData] = useState({
@@ -10,7 +11,7 @@ export default function Register() {
         password: '',
         role: 'STUDENT'
     });
-    const { register, isLoading, error } = useAuthStore();
+    const { register, googleLogin, isLoading, error } = useAuthStore();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -22,8 +23,17 @@ export default function Register() {
         try {
             await register(formData);
             navigate('/dashboard');
-        } catch (err) {
+        } catch {
             // Error handled by store
+        }
+    };
+
+    const handleGoogleSuccess = async (response) => {
+        try {
+            await googleLogin(response.credential);
+            navigate('/dashboard');
+        } catch {
+            // Error handled in store
         }
     };
 
@@ -129,6 +139,24 @@ export default function Register() {
                             </span>
                         )}
                     </button>
+
+                    <div className="relative mt-6 mb-2">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-purple-300/30"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-[#1b1c43] text-purple-200 bg-opacity-100 mix-blend-normal">Or continue with</span>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-center">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => console.log('Registration Failed')}
+                            theme="filled_black"
+                            shape="pill"
+                        />
+                    </div>
 
                     <p className="text-center text-sm text-purple-100/70 mt-4">
                         Already have an account? <Link to="/login" className="font-medium text-purple-300 hover:text-white transition-colors">Sign in</Link>

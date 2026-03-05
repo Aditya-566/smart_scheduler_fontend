@@ -34,6 +34,31 @@ export const useAuthStore = create((set) => ({
         }
     },
 
+    googleLogin: async (credential) => {
+        set({ isLoading: true, error: null });
+        try {
+            const { data } = await api.post('/auth/google', { credential });
+            localStorage.setItem('token', data.token);
+            set({
+                user: {
+                    _id: data._id,
+                    name: data.name,
+                    email: data.email,
+                    role: data.role
+                },
+                token: data.token,
+                isAuthenticated: true,
+                isLoading: false
+            });
+        } catch (error) {
+            set({
+                error: error.response?.data?.message || 'Google Login failed',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
     register: async (userData) => {
         set({ isLoading: true, error: null });
         try {
@@ -78,7 +103,7 @@ export const useAuthStore = create((set) => ({
 
             const { data } = await api.get('/auth/me');
             set({ user: data, isAuthenticated: true });
-        } catch (error) {
+        } catch {
             localStorage.removeItem('token');
             set({ user: null, token: null, isAuthenticated: false });
         }

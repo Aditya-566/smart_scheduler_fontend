@@ -1,0 +1,15 @@
+
+C:\Users\adity\OneDrive\Pictures\Nitro\Desktop\Smart Classroom & Timetable Scheduler\frontend\src\pages\Courses.jsx
+  2:8  error  'api' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\adity\OneDrive\Pictures\Nitro\Desktop\Smart Classroom & Timetable Scheduler\frontend\src\pages\Login.jsx
+  17:18  error  'err' is defined but never used  no-unused-vars
+
+C:\Users\adity\OneDrive\Pictures\Nitro\Desktop\Smart Classroom & Timetable Scheduler\frontend\src\pages\Register.jsx
+  25:18  error  'err' is defined but never used  no-unused-vars
+
+C:\Users\adity\OneDrive\Pictures\Nitro\Desktop\Smart Classroom & Timetable Scheduler\frontend\src\store\useAuthStore.js
+  81:18  error  'error' is defined but never used  no-unused-vars
+
+✖ 4 problems (4 errors, 0 warnings)
+
