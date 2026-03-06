@@ -2,12 +2,11 @@ import { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogIn, Mail, Lock } from 'lucide-react';
-import { GoogleLogin } from '@react-oauth/google';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login, googleLogin, isLoading, error } = useAuthStore();
+    const { login, isLoading, error } = useAuthStore();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -20,14 +19,7 @@ export default function Login() {
         }
     };
 
-    const handleGoogleSuccess = async (response) => {
-        try {
-            await googleLogin(response.credential);
-            navigate('/dashboard');
-        } catch {
-            // Error handled in store
-        }
-    };
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-blue-900 to-slate-900 relative overflow-hidden">
@@ -106,23 +98,7 @@ export default function Login() {
                         )}
                     </button>
 
-                    <div className="relative mt-6">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-blue-300/30"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-[#121c43] text-blue-200 bg-opacity-100 mix-blend-normal">Or continue with</span>
-                        </div>
-                    </div>
 
-                    <div className="mt-6 flex justify-center">
-                        <GoogleLogin
-                            onSuccess={handleGoogleSuccess}
-                            onError={() => console.log('Login Failed')}
-                            theme="filled_black"
-                            shape="pill"
-                        />
-                    </div>
 
                     <p className="text-center text-sm text-blue-100/70 mt-4">
                         Don't have an account? <Link to="/register" className="font-medium text-blue-300 hover:text-white transition-colors">Sign up</Link>
