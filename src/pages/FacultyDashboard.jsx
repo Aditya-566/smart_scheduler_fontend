@@ -1,19 +1,84 @@
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { BookOpen, Clock, Calendar } from 'lucide-react';
+import api from '../services/api';
 
 export default function FacultyDashboard() {
     const { user } = useAuthStore();
+    const [schedules, setSchedules] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const stats = [
-        { label: 'My Courses', value: '3', icon: BookOpen, color: 'bg-indigo-500' },
-        { label: 'Weekly Hours', value: '18', icon: Clock, color: 'bg-rose-500' },
-        { label: 'Upcoming Classes', value: '4', icon: Calendar, color: 'bg-teal-500' },
-    ];
+    const [stats, setStats] = useState([
+        { label: 'My Courses', value: '0', icon: BookOpen, color: 'bg-indigo-500' },
+        { label: 'Weekly Hours', value: '0', icon: Clock, color: 'bg-rose-500' },
+        { label: 'Upcoming Classes', value: '0', icon: Calendar, color: 'bg-teal-500' },
+    ]);
+    const [todayTimeline, setTodayTimeline] = useState([]);
+
+    useEffect(() => {
+        const fetchSchedules = async () => {
+            try {
+                const { data } = await api.get('/schedules');
+                setSchedules(data);
+
+                // Process Data
+                processDashboardData(data);
+            } catch (error) {
+                console.error("Error fetching schedules:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (user) {
+            fetchSchedules();
+        }
+    }, [user]);
+
+    const processDashboardData = (data) => {
+        // 1. My Courses (Unique courses)
+        const uniqueCourses = new Set(data.map(item => item.course?._id)).size;
+
+        // 2. Weekly Hours
+        let totalMinutes = 0;
+        data.forEach(item => {
+            if (item.timeSlot && item.timeSlot.startTime && item.timeSlot.endTime) {
+                const [startH, startM] = item.timeSlot.startTime.split(':').map(Number);
+                const [endH, endM] = item.timeSlot.endTime.split(':').map(Number);
+                totalMinutes += (endH * 60 + endM) - (startH * 60 + startM);
+            }
+        });
+        const weeklyHours = Math.round(totalMinutes / 60);
+
+        // 3. Today's Timeline & Upcoming Classes
+        const currentDayOfWeek = new Date().getDay();
+        const now = new Date();
+        const currentTimeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+        const todaysSchedules = data.filter(item => item.timeSlot?.dayOfWeek === currentDayOfWeek);
+
+        // Sort chronologically
+        todaysSchedules.sort((a, b) => a.timeSlot.startTime.localeCompare(b.timeSlot.startTime));
+
+        setTodayTimeline(todaysSchedules);
+
+        const upcomingClasses = todaysSchedules.filter(item => item.timeSlot.startTime >= currentTimeString).length;
+
+        setStats([
+            { label: 'My Courses', value: uniqueCourses.toString(), icon: BookOpen, color: 'bg-indigo-500' },
+            { label: 'Weekly Hours', value: weeklyHours.toString(), icon: Clock, color: 'bg-rose-500' },
+            { label: 'Upcoming Classes', value: upcomingClasses.toString(), icon: Calendar, color: 'bg-teal-500' },
+        ]);
+    };
+
+    if (loading) {
+        return <div className="p-8 text-center text-slate-500">Loading dashboard...</div>;
+    }
 
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-slate-900">Welcome, Professor {user?.name.split(' ')[0]}</h1>
+                <h1 className="text-2xl font-bold text-slate-900">Welcome, Professor {user?.name?.split(' ')[0] || ''}</h1>
                 <p className="text-slate-500">Here is your schedule overview for today.</p>
             </div>
 
@@ -32,41 +97,35 @@ export default function FacultyDashboard() {
                 ))}
             </div>
 
-            {/* Today's Schedule Timeline Placeholder */}
+            {/* Today's Schedule Timeline */}
             <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm mt-8">
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-lg font-bold text-slate-800">Today's Timeline</h3>
                     <button className="text-sm font-medium text-blue-600 hover:text-blue-700">View Full Week</button>
                 </div>
 
-                <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
-                    {/* Placeholder Timeline Item */}
-                    <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-200 text-slate-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
-                            <Clock className="w-5 h-5" />
-                        </div>
-                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl border border-slate-100 shadow">
-                            <div className="flex items-center justify-between mb-1">
-                                <div className="font-bold text-slate-900">Data Structures CS-201</div>
-                                <time className="text-sm font-medium text-indigo-500">09:00 AM</time>
+                {todayTimeline.length > 0 ? (
+                    <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+                        {todayTimeline.map((item, index) => (
+                            <div key={item._id || index} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-200 text-slate-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
+                                    <Clock className="w-5 h-5" />
+                                </div>
+                                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl border border-slate-100 shadow hover:shadow-md transition-shadow">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <div className="font-bold text-slate-900">{item.course?.name} ({item.course?.code})</div>
+                                        <time className="text-sm font-medium text-indigo-500">{item.timeSlot?.startTime} - {item.timeSlot?.endTime}</time>
+                                    </div>
+                                    <div className="text-sm text-slate-500">Room {item.room?.number} - {item.batchInfo}</div>
+                                </div>
                             </div>
-                            <div className="text-sm text-slate-500">Room 402 - Main Block</div>
-                        </div>
+                        ))}
                     </div>
-                    {/* Placeholder Timeline Item 2 */}
-                    <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-200 text-slate-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
-                            <Clock className="w-5 h-5" />
-                        </div>
-                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl border border-slate-100 shadow">
-                            <div className="flex items-center justify-between mb-1">
-                                <div className="font-bold text-slate-900">Algorithms Lab CS-202</div>
-                                <time className="text-sm font-medium text-emerald-500">11:00 AM</time>
-                            </div>
-                            <div className="text-sm text-slate-500">Computer Lab 3</div>
-                        </div>
+                ) : (
+                    <div className="text-center text-slate-500 py-8">
+                        No classes scheduled for today.
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

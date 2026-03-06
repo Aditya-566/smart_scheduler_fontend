@@ -1,22 +1,31 @@
 import { useState, useEffect, useMemo } from 'react';
-
+import api from '../services/api';
 import { BookOpen, Search, Plus, MapPin, Edit, Trash2 } from 'lucide-react';
 
 export default function Courses() {
     const [courses, setCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        // Mock fetch to simulate dynamic loading
-        setTimeout(() => {
-            setCourses([
-                { id: 1, code: 'CS-101', name: 'Introduction to Computer Science', credits: 4, department: 'CS', faculty: 'Dr. Smith' },
-                { id: 2, code: 'CS-201', name: 'Data Structures', credits: 3, department: 'CS', faculty: 'Prof. Alan' },
-                { id: 3, code: 'EE-101', name: 'Basic Electrical Eng', credits: 3, department: 'EE', faculty: 'Dr. Tesla' }
-            ]);
-            setIsLoading(false);
-        }, 1000);
+        const fetchCourses = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+                // Fetch courses from API
+                const { data } = await api.get('/courses');
+                setCourses(data || []);
+            } catch (err) {
+                setError(err.response?.data?.message || 'Failed to load courses');
+                console.error('Error fetching courses:', err);
+                setCourses([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCourses();
     }, []);
 
     // Performance Optimization: useMemo for filtering
@@ -47,6 +56,11 @@ export default function Courses() {
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                {error && (
+                    <div className="p-4 bg-red-50 border-b border-red-200">
+                        <p className="text-sm text-red-800">{error}</p>
+                    </div>
+                )}
                 <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div className="relative w-full sm:w-80">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -71,6 +85,10 @@ export default function Courses() {
                     <div className="p-8 flex justify-center">
                         <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
                     </div>
+                ) : filteredCourses.length === 0 ? (
+                    <div className="p-8 text-center text-slate-500">
+                        <p>No courses found. {searchTerm ? 'Try a different search.' : 'Add a new course to get started.'}</p>
+                    </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
@@ -85,7 +103,7 @@ export default function Courses() {
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {filteredCourses.map(course => (
-                                    <tr key={course.id} className="hover:bg-slate-50/50 transition-colors">
+                                    <tr key={course._id || course.id} className="hover:bg-slate-50/50 transition-colors">
                                         <td className="px-6 py-4 font-semibold text-slate-800">{course.code}</td>
                                         <td className="px-6 py-4 text-slate-600 font-medium">{course.name}</td>
                                         <td className="px-6 py-4">

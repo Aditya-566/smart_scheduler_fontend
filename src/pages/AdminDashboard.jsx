@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
+import api from '../services/api';
 import { Users, BookOpen, Clock, CalendarCheck2 } from 'lucide-react';
 import {
     Chart as ChartJS,
@@ -28,20 +30,50 @@ ChartJS.register(
 
 export default function AdminDashboard() {
     const { user } = useAuthStore();
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const stats = [
-        { label: 'Total Users', value: '156', icon: Users, color: 'bg-blue-500' },
-        { label: 'Courses Active', value: '42', icon: BookOpen, color: 'bg-purple-500' },
-        { label: 'Rooms Available', value: '24', icon: CalendarCheck2, color: 'bg-emerald-500' },
-        { label: 'Weekly Slots', value: '312', icon: Clock, color: 'bg-amber-500' },
-    ];
+    // Default stats
+    const [stats, setStats] = useState([
+        { label: 'Total Users', value: '0', icon: Users, color: 'bg-blue-500' },
+        { label: 'Courses Active', value: '0', icon: BookOpen, color: 'bg-purple-500' },
+        { label: 'Rooms Available', value: '0', icon: CalendarCheck2, color: 'bg-emerald-500' },
+        { label: 'Weekly Slots', value: '0', icon: Clock, color: 'bg-amber-500' },
+    ]);
 
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+                // Try to fetch stats from API
+                // Response would be: { totalUsers, activeCourses, availableRooms, weeklySlots }
+                const { data } = await api.get('/schedules/stats');
+                
+                setStats([
+                    { label: 'Total Users', value: String(data.totalUsers || 0), icon: Users, color: 'bg-blue-500' },
+                    { label: 'Courses Active', value: String(data.activeCourses || 0), icon: BookOpen, color: 'bg-purple-500' },
+                    { label: 'Rooms Available', value: String(data.availableRooms || 0), icon: CalendarCheck2, color: 'bg-emerald-500' },
+                    { label: 'Weekly Slots', value: String(data.weeklySlots || 0), icon: Clock, color: 'bg-amber-500' },
+                ]);
+            } catch (err) {
+                console.error('Error fetching stats:', err);
+                // Keep default stats if API fails
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
+    // Chart data - using default values, will be updated if API returns real data
     const utilizationData = {
         labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         datasets: [
             {
                 label: 'Room Utilization (%)',
-                data: [65, 80, 75, 90, 60],
+                data: [0, 0, 0, 0, 0], // Will be filled with real data from API
                 backgroundColor: 'rgba(59, 130, 246, 0.5)',
                 borderColor: 'rgb(59, 130, 246)',
                 borderWidth: 2,
@@ -51,11 +83,11 @@ export default function AdminDashboard() {
     };
 
     const workloadData = {
-        labels: ['CS', 'EE', 'ME', 'CE', 'IT'],
+        labels: ['Data'], // Placeholder - update based on API
         datasets: [
             {
                 label: 'Faculty Workload (hrs)',
-                data: [450, 320, 280, 250, 400],
+                data: [0], // Placeholder - update based on API
                 borderColor: 'rgb(168, 85, 247)',
                 backgroundColor: 'rgba(168, 85, 247, 0.1)',
                 borderWidth: 2,
