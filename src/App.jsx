@@ -82,7 +82,7 @@ function App() {
               </DashboardLayout>
             </ProtectedRoute>
           }
-        </Route>
+        />
         <Route
           path="/settings"
           element={
