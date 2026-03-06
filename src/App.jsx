@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Timetable from './pages/Timetable';
 import Courses from './pages/Courses';
 import Rooms from './pages/Rooms';
+import Settings from './pages/Settings';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -78,6 +79,16 @@ function App() {
             <ProtectedRoute>
               <DashboardLayout>
                 <Rooms />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        </Route>
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Settings />
               </DashboardLayout>
             </ProtectedRoute>
           }
