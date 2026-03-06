@@ -7,6 +7,7 @@ export default function Register() {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        loginId: '',
         password: '',
         role: 'STUDENT'
     });
@@ -79,6 +80,24 @@ export default function Register() {
                                 onChange={handleChange}
                                 className="block w-full pl-10 pr-3 py-3 border border-purple-300/30 rounded-xl bg-white/5 text-white placeholder-purple-200/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
                                 placeholder="you@university.edu"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-purple-100 mb-1">Login ID</label>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <User className="h-5 w-5 text-purple-300" />
+                            </div>
+                            <input
+                                type="text"
+                                name="loginId"
+                                value={formData.loginId}
+                                onChange={handleChange}
+                                className="block w-full pl-10 pr-3 py-3 border border-purple-300/30 rounded-xl bg-white/5 text-white placeholder-purple-200/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
+                                placeholder="Format: AD+5, F+4, or SD+10 numbers"
                                 required
                             />
                         </div>

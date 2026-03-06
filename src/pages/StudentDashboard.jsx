@@ -1,8 +1,39 @@
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
-import { Calendar, Search, MapPin } from 'lucide-react';
+import { Calendar, Search, MapPin, Clock } from 'lucide-react';
+import api from '../services/api';
 
 export default function StudentDashboard() {
     const { user } = useAuthStore();
+    const [schedules, setSchedules] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [upNext, setUpNext] = useState(null);
+
+    useEffect(() => {
+        const fetchSchedules = async () => {
+            try {
+                const { data } = await api.get('/schedules');
+                setSchedules(data);
+                
+                // Extremely simple logic to find "Next" class for demo purposes
+                // In production, this should compare with current time and day
+                const currentDayOfWeek = new Date().getDay();
+                const todaysSchedules = data.filter(item => item.timeSlot?.dayOfWeek === currentDayOfWeek);
+                if (todaysSchedules.length > 0) {
+                    todaysSchedules.sort((a, b) => a.timeSlot.startTime.localeCompare(b.timeSlot.startTime));
+                    setUpNext(todaysSchedules[0]);
+                }
+            } catch (error) {
+                console.error("Error fetching schedules:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (user) {
+            fetchSchedules();
+        }
+    }, [user]);
 
     return (
         <div className="space-y-6">
@@ -30,27 +61,36 @@ export default function StudentDashboard() {
 
             <div className="mt-8">
                 <h3 className="text-xl font-bold text-slate-800 mb-4">Up Next</h3>
-                <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
-                    <div className="flex items-center gap-6">
-                        <div className="bg-blue-50 text-blue-600 p-4 rounded-2xl text-center min-w-[100px]">
-                            <p className="text-sm font-bold uppercase">Today</p>
-                            <p className="text-2xl font-black">14:00</p>
-                        </div>
-                        <div>
-                            <h4 className="text-xl font-bold text-slate-900 mb-1">Operating Systems (CS-301)</h4>
-                            <div className="flex items-center text-slate-500 text-sm">
-                                <MapPin className="h-4 w-4 mr-1" />
-                                Lecture Hall 1
+                {loading ? (
+                    <div className="text-slate-500">Loading your schedule...</div>
+                ) : upNext ? (
+                    <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
+                        <div className="flex items-center gap-6">
+                            <div className="bg-blue-50 text-blue-600 p-4 rounded-2xl text-center min-w-[100px]">
+                                <p className="text-sm font-bold uppercase">Today</p>
+                                <p className="text-2xl font-black">{upNext.timeSlot?.startTime}</p>
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold text-slate-900 mb-1">{upNext.course?.name || 'Class'} ({upNext.course?.code || ''})</h4>
+                                <div className="flex items-center text-slate-500 text-sm mt-1">
+                                    <MapPin className="h-4 w-4 mr-1" />
+                                    Room {upNext.room?.number || 'TBA'}
+                                </div>
+                                <div className="flex items-center text-slate-500 text-sm mt-1">
+                                    <Clock className="h-4 w-4 mr-1" />
+                                    {upNext.timeSlot?.startTime} - {upNext.timeSlot?.endTime}
+                                </div>
                             </div>
                         </div>
+                        <div className="text-center md:text-right">
+                            <p className="text-sm text-slate-500 font-medium mb-1">{upNext.faculty?.name ? `Prof. ${upNext.faculty.name}` : 'Faculty TBA'}</p>
+                        </div>
                     </div>
-                    <div className="text-center md:text-right">
-                        <p className="text-sm text-slate-500 font-medium mb-1">Prof. Alan Turing</p>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                            In 1 hour
-                        </span>
+                ) : (
+                    <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm text-center text-slate-500">
+                        No upcoming classes scheduled for today. Enjoy your free time!
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

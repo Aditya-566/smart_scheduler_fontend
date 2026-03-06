@@ -9,16 +9,17 @@ export const useAuthStore = create((set) => ({
     isLoading: false,
     error: null,
 
-    login: async (email, password) => {
+    login: async (loginId, password) => {
         set({ isLoading: true, error: null });
         try {
-            const { data } = await api.post('/auth/login', { email, password });
+            const { data } = await api.post('/auth/login', { loginId, password });
             localStorage.setItem('token', data.token);
             set({
                 user: {
                     _id: data._id,
                     name: data.name,
                     email: data.email,
+                    loginId: data.loginId,
                     role: data.role
                 },
                 token: data.token,
@@ -46,6 +47,7 @@ export const useAuthStore = create((set) => ({
                     _id: data._id,
                     name: data.name,
                     email: data.email,
+                    loginId: data.loginId,
                     role: data.role
                 },
                 token: data.token,

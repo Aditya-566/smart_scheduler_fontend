@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogIn, Mail, Lock } from 'lucide-react';
+import { LogIn, Mail, Lock, User } from 'lucide-react';
 
 export default function Login() {
-    const [email, setEmail] = useState('');
+    const [loginId, setLoginId] = useState('');
     const [password, setPassword] = useState('');
     const { login, isLoading, error } = useAuthStore();
     const navigate = useNavigate();
@@ -12,7 +12,7 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await login(email, password);
+            await login(loginId, password);
             navigate('/dashboard');
         } catch {
             // Error is handled in store
@@ -42,17 +42,17 @@ export default function Login() {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-blue-100 mb-2">Email Address</label>
+                        <label className="block text-sm font-medium text-blue-100 mb-2">Login ID</label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Mail className="h-5 w-5 text-blue-300" />
+                                <User className="h-5 w-5 text-blue-300" />
                             </div>
                             <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                type="text"
+                                value={loginId}
+                                onChange={(e) => setLoginId(e.target.value)}
                                 className="block w-full pl-10 pr-3 py-3 border border-blue-300/30 rounded-xl bg-white/5 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
-                                placeholder="you@university.edu"
+                                placeholder="e.g. AD12345, F1234, SD1234567890"
                                 required
                             />
                         </div>

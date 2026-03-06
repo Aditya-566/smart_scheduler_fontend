@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import api from '../services/api';
-import { Users, BookOpen, Clock, CalendarCheck2 } from 'lucide-react';
+import { Users, BookOpen, Clock, CalendarCheck2, X } from 'lucide-react';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -40,6 +40,37 @@ export default function AdminDashboard() {
         { label: 'Rooms Available', value: '0', icon: CalendarCheck2, color: 'bg-emerald-500' },
         { label: 'Weekly Slots', value: '0', icon: Clock, color: 'bg-amber-500' },
     ]);
+
+    // Generate Modal State
+    const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
+    const [departments, setDepartments] = useState([]);
+    const [rooms, setRooms] = useState([]);
+    const [formConfig, setFormConfig] = useState({
+        departmentId: '',
+        maxClassesPerDay: 4,
+        availableRooms: []
+    });
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [generateResult, setGenerateResult] = useState(null);
+
+    const openGenerateModal = async () => {
+        setIsGenerateModalOpen(true);
+        setGenerateResult(null);
+        try {
+            const [deptRes, roomRes] = await Promise.all([
+                api.get('/schedules/departments'),
+                api.get('/schedules/rooms')
+            ]);
+            setDepartments(deptRes.data);
+            setRooms(roomRes.data);
+            if (deptRes.data.length > 0) {
+                setFormConfig(prev => ({ ...prev, departmentId: deptRes.data[0]._id }));
+            }
+            setFormConfig(prev => ({ ...prev, availableRooms: roomRes.data.map(r => r._id) }));
+        } catch (err) {
+            console.error('Failed to fetch modal data', err);
+        }
+    };
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -150,7 +181,7 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
                 <h3 className="text-lg font-bold text-slate-800 mb-4">Quick Actions</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button className="py-4 px-6 bg-blue-50 text-blue-700 rounded-xl font-medium hover:bg-blue-100 transition-colors text-left flex justify-between items-center group">
+                    <button onClick={openGenerateModal} className="py-4 px-6 bg-blue-50 text-blue-700 rounded-xl font-medium hover:bg-blue-100 transition-colors text-left flex justify-between items-center group">
                         Generate Next Week Schedule
                         <span className="transform group-hover:translate-x-1 transition-transform">→</span>
                     </button>
@@ -164,6 +195,102 @@ export default function AdminDashboard() {
                     </button>
                 </div>
             </div>
+
+            {/* Generate Schedule Modal */}
+            {isGenerateModalOpen && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                            <h2 className="text-xl font-bold text-slate-900">Generate Schedule</h2>
+                            <button onClick={() => setIsGenerateModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                        
+                        <div className="p-6 space-y-4">
+                            {generateResult ? (
+                                <div className="p-4 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100">
+                                    <h4 className="font-bold mb-1">Success!</h4>
+                                    <p className="text-sm">{generateResult.message}</p>
+                                    <p className="text-xs mt-2 opacity-80">Generated {generateResult.count} slots.</p>
+                                    <button onClick={() => setIsGenerateModalOpen(false)} className="mt-4 w-full py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">Close</button>
+                                </div>
+                            ) : (
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Select Department</label>
+                                        <select 
+                                            value={formConfig.departmentId}
+                                            onChange={(e) => setFormConfig({...formConfig, departmentId: e.target.value})}
+                                            className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                        >
+                                            {departments.map(d => (
+                                                <option key={d._id} value={d._id}>{d.name}</option>
+                                            ))}
+                                            {departments.length === 0 && <option value="" disabled>No departments available</option>}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Max Classes Per Day (Batch Load)</label>
+                                        <input 
+                                            type="number" 
+                                            min="1" max="8"
+                                            value={formConfig.maxClassesPerDay}
+                                            onChange={(e) => setFormConfig({...formConfig, maxClassesPerDay: parseInt(e.target.value)})}
+                                            className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Available Rooms</label>
+                                        <div className="max-h-40 overflow-y-auto space-y-2 border border-slate-200 rounded-lg p-3 bg-slate-50">
+                                            {rooms.map(r => (
+                                                <label key={r._id} className="flex items-center gap-2 cursor-pointer">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        checked={formConfig.availableRooms.includes(r._id)}
+                                                        onChange={(e) => {
+                                                            const newRooms = e.target.checked 
+                                                                ? [...formConfig.availableRooms, r._id]
+                                                                : formConfig.availableRooms.filter(id => id !== r._id);
+                                                            setFormConfig({...formConfig, availableRooms: newRooms});
+                                                        }}
+                                                        className="rounded text-blue-600 focus:ring-blue-500"
+                                                    />
+                                                    <span className="text-sm text-slate-700">Room {r.number} (Cap: {r.capacity})</span>
+                                                </label>
+                                            ))}
+                                            {rooms.length === 0 && <span className="text-sm text-slate-500">No rooms found.</span>}
+                                        </div>
+                                    </div>
+
+                                    <button 
+                                        onClick={async () => {
+                                            setIsGenerating(true);
+                                            try {
+                                                const { data } = await api.post(`/schedules/generate/${formConfig.departmentId}`, {
+                                                    maxClassesPerDay: formConfig.maxClassesPerDay,
+                                                    availableRooms: formConfig.availableRooms
+                                                });
+                                                setGenerateResult(data);
+                                            } catch (err) {
+                                                alert(err.response?.data?.message || err.message || 'Generation failed');
+                                            } finally {
+                                                setIsGenerating(false);
+                                            }
+                                        }}
+                                        disabled={isGenerating || !formConfig.departmentId || formConfig.availableRooms.length === 0}
+                                        className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold shadow-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center mt-6"
+                                    >
+                                        {isGenerating ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : 'Generate Timetable'}
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
