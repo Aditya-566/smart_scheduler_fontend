@@ -6,6 +6,7 @@ import api from '../services/api';
 export default function FacultyDashboard() {
     const { user } = useAuthStore();
     const [schedules, setSchedules] = useState([]);
+    const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const [stats, setStats] = useState([
@@ -16,32 +17,37 @@ export default function FacultyDashboard() {
     const [todayTimeline, setTodayTimeline] = useState([]);
 
     useEffect(() => {
-        const fetchSchedules = async () => {
+        const fetchFacultyData = async () => {
             try {
-                const { data } = await api.get('/schedules');
-                setSchedules(data);
+                // Fetch faculty's assigned courses
+                const { data: courseData } = await api.get('/courses/faculty/my-courses');
+                setCourses(courseData);
 
-                // Process Data
-                processDashboardData(data);
+                // Fetch faculty's schedules (backend filters by faculty ID)
+                const { data: scheduleData } = await api.get('/schedules');
+                setSchedules(scheduleData);
+
+                // Process Dashboard Data
+                processDashboardData(scheduleData, courseData);
             } catch (error) {
-                console.error("Error fetching schedules:", error);
+                console.error("Error fetching faculty data:", error);
             } finally {
                 setLoading(false);
             }
         };
 
         if (user) {
-            fetchSchedules();
+            fetchFacultyData();
         }
     }, [user]);
 
-    const processDashboardData = (data) => {
-        // 1. My Courses (Unique courses)
-        const uniqueCourses = new Set(data.map(item => item.course?._id)).size;
+    const processDashboardData = (scheduleData, courseData) => {
+        // 1. My Courses (from courses endpoint)
+        const myCourses = courseData.length;
 
         // 2. Weekly Hours
         let totalMinutes = 0;
-        data.forEach(item => {
+        scheduleData.forEach(item => {
             if (item.timeSlot && item.timeSlot.startTime && item.timeSlot.endTime) {
                 const [startH, startM] = item.timeSlot.startTime.split(':').map(Number);
                 const [endH, endM] = item.timeSlot.endTime.split(':').map(Number);
@@ -55,7 +61,7 @@ export default function FacultyDashboard() {
         const now = new Date();
         const currentTimeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-        const todaysSchedules = data.filter(item => item.timeSlot?.dayOfWeek === currentDayOfWeek);
+        const todaysSchedules = scheduleData.filter(item => item.timeSlot?.dayOfWeek === currentDayOfWeek);
 
         // Sort chronologically
         todaysSchedules.sort((a, b) => a.timeSlot.startTime.localeCompare(b.timeSlot.startTime));
@@ -65,7 +71,7 @@ export default function FacultyDashboard() {
         const upcomingClasses = todaysSchedules.filter(item => item.timeSlot.startTime >= currentTimeString).length;
 
         setStats([
-            { label: 'My Courses', value: uniqueCourses.toString(), icon: BookOpen, color: 'bg-indigo-500' },
+            { label: 'My Courses', value: myCourses.toString(), icon: BookOpen, color: 'bg-indigo-500' },
             { label: 'Weekly Hours', value: weeklyHours.toString(), icon: Clock, color: 'bg-rose-500' },
             { label: 'Upcoming Classes', value: upcomingClasses.toString(), icon: Calendar, color: 'bg-teal-500' },
         ]);
@@ -123,7 +129,9 @@ export default function FacultyDashboard() {
                     </div>
                 ) : (
                     <div className="text-center text-slate-500 py-8">
-                        No classes scheduled for today.
+                        {courses.length > 0 
+                            ? "No classes scheduled for today. Check back later!" 
+                            : "No courses assigned yet. Contact your administrator."}
                     </div>
                 )}
             </div>
