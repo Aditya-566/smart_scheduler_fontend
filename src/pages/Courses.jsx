@@ -1,14 +1,17 @@
 import { useState, useEffect, useMemo } from 'react';
 import api from '../services/api';
-import { BookOpen, Search, Plus, Edit, Trash2, X } from 'lucide-react';
+import { BookOpen, Search, Plus, Edit, Trash2, X, UserIcon } from 'lucide-react';
 
 export default function Courses() {
     const [courses, setCourses] = useState([]);
     const [departments, setDepartments] = useState([]);
+    const [facultyList, setFacultyList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editingCourseId, setEditingCourseId] = useState(null);
     const [formData, setFormData] = useState({
         name: '', code: '', department: '', credits: 3, faculty: ''
     });
@@ -28,12 +31,21 @@ export default function Courses() {
         }
     };
 
+    const fetchFaculty = async () => {
+        try {
+            const { data } = await api.get('/auth/users');
+            setFacultyList(data.filter(u => u.role === 'FACULTY'));
+        } catch {
+            setFacultyList([]);
+        }
+    };
+
     useEffect(() => {
         fetchCourses();
-        // Fetch departments for the dropdown
         api.get('/departments').then(res => {
             setDepartments(res.data || []);
         }).catch(() => {});
+        fetchFaculty();
     }, []);
 
     const handleDelete = async (id) => {
@@ -46,18 +58,43 @@ export default function Courses() {
         }
     };
 
+    const openCreateModal = () => {
+        setIsEditMode(false);
+        setEditingCourseId(null);
+        setFormData({ name: '', code: '', department: '', credits: 3, faculty: '' });
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (course) => {
+        setIsEditMode(true);
+        setEditingCourseId(course._id);
+        setFormData({
+            name: course.name,
+            code: course.code,
+            department: course.department?._id || course.department || '',
+            credits: course.credits,
+            faculty: course.faculty?._id || course.faculty || ''
+        });
+        setIsModalOpen(true);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
             const payload = { ...formData };
             if (!payload.faculty) delete payload.faculty;
-            await api.post('/courses', payload);
+
+            if (isEditMode && editingCourseId) {
+                await api.put(`/courses/${editingCourseId}`, payload);
+            } else {
+                await api.post('/courses', payload);
+            }
             setIsModalOpen(false);
             setFormData({ name: '', code: '', department: '', credits: 3, faculty: '' });
             fetchCourses();
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to create course');
+            alert(err.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} course`);
         } finally {
             setIsSubmitting(false);
         }
@@ -83,7 +120,7 @@ export default function Courses() {
                     <p className="text-slate-500 mt-1">Add, update, or remove academic courses from the catalog.</p>
                 </div>
 
-                <button onClick={() => setIsModalOpen(true)} className="px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
+                <button onClick={openCreateModal} className="px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
                     <Plus className="w-5 h-5" />
                     New Course
                 </button>
@@ -131,6 +168,7 @@ export default function Courses() {
                                     <th className="px-6 py-4">Course Name</th>
                                     <th className="px-6 py-4">Credits</th>
                                     <th className="px-6 py-4">Department</th>
+                                    <th className="px-6 py-4">Faculty</th>
                                     <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -149,8 +187,17 @@ export default function Courses() {
                                                 {course.department?.name || course.department}
                                             </span>
                                         </td>
+                                        <td className="px-6 py-4 text-slate-600">
+                                            {course.faculty ? (
+                                                <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    {course.faculty.name || course.faculty}
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs text-slate-400 italic">Not assigned</span>
+                                            )}
+                                        </td>
                                         <td className="px-6 py-4 flex justify-end gap-2">
-                                            <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                            <button onClick={() => openEditModal(course)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                                 <Edit className="w-4 h-4" />
                                             </button>
                                             <button onClick={() => handleDelete(course._id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
@@ -165,12 +212,12 @@ export default function Courses() {
                 )}
             </div>
 
-            {/* Add Course Modal */}
+            {/* Add/Edit Course Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                            <h2 className="text-xl font-bold text-slate-900">Add New Course</h2>
+                            <h2 className="text-xl font-bold text-slate-900">{isEditMode ? 'Edit Course' : 'Add New Course'}</h2>
                             <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                                 <X className="h-5 w-5" />
                             </button>
@@ -184,7 +231,8 @@ export default function Courses() {
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Course Code</label>
                                 <input type="text" required value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})}
-                                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. CS201" />
+                                    disabled={isEditMode}
+                                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 disabled:cursor-not-allowed" placeholder="e.g. CS201" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Department</label>
@@ -200,9 +248,18 @@ export default function Courses() {
                                 <input type="number" min="1" max="6" required value={formData.credits} onChange={e => setFormData({...formData, credits: parseInt(e.target.value)})}
                                     className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
                             </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Assigned Faculty (Optional)</label>
+                                <select value={formData.faculty} onChange={e => setFormData({...formData, faculty: e.target.value})}
+                                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="">No Faculty Assigned</option>
+                                    {facultyList.map(f => <option key={f._id} value={f._id}>{f.name} ({f.email})</option>)}
+                                </select>
+                                {facultyList.length === 0 && <p className="text-xs text-slate-500 mt-1">No faculty users registered yet.</p>}
+                            </div>
                             <button type="submit" disabled={isSubmitting}
                                 className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold shadow-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center mt-4">
-                                {isSubmitting ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : 'Create Course'}
+                                {isSubmitting ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : (isEditMode ? 'Update Course' : 'Create Course')}
                             </button>
                         </form>
                     </div>

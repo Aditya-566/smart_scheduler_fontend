@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { Users, BookOpen, Clock, CalendarCheck2, X } from 'lucide-react';
+import { Users, BookOpen, Clock, CalendarCheck2, X, BarChart3 } from 'lucide-react';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -30,16 +31,18 @@ ChartJS.register(
 
 export default function AdminDashboard() {
     const { user } = useAuthStore();
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
 
-    // Default stats
     const [stats, setStats] = useState([
         { label: 'Total Users', value: '0', icon: Users, color: 'bg-blue-500' },
         { label: 'Courses Active', value: '0', icon: BookOpen, color: 'bg-purple-500' },
         { label: 'Rooms Available', value: '0', icon: CalendarCheck2, color: 'bg-emerald-500' },
         { label: 'Weekly Slots', value: '0', icon: Clock, color: 'bg-amber-500' },
     ]);
+
+    const [utilizationPercent, setUtilizationPercent] = useState([0, 0, 0, 0, 0]);
+    const [deptWorkload, setDeptWorkload] = useState({});
 
     // Generate Modal State
     const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
@@ -48,14 +51,17 @@ export default function AdminDashboard() {
     const [formConfig, setFormConfig] = useState({
         departmentId: '',
         maxClassesPerDay: 4,
-        availableRooms: []
+        availableRooms: [],
+        batchInfo: ''
     });
     const [isGenerating, setIsGenerating] = useState(false);
     const [generateResult, setGenerateResult] = useState(null);
+    const [generateError, setGenerateError] = useState(null);
 
     const openGenerateModal = async () => {
         setIsGenerateModalOpen(true);
         setGenerateResult(null);
+        setGenerateError(null);
         try {
             const [deptRes, roomRes] = await Promise.all([
                 api.get('/schedules/departments'),
@@ -76,20 +82,23 @@ export default function AdminDashboard() {
         const fetchStats = async () => {
             try {
                 setIsLoading(true);
-                setError(null);
-                // Try to fetch stats from API
-                // Response would be: { totalUsers, activeCourses, availableRooms, weeklySlots }
                 const { data } = await api.get('/schedules/stats');
                 
                 setStats([
                     { label: 'Total Users', value: String(data.totalUsers || 0), icon: Users, color: 'bg-blue-500' },
                     { label: 'Courses Active', value: String(data.activeCourses || 0), icon: BookOpen, color: 'bg-purple-500' },
                     { label: 'Rooms Available', value: String(data.availableRooms || 0), icon: CalendarCheck2, color: 'bg-emerald-500' },
-                    { label: 'Weekly Slots', value: String(data.weeklySlots || 0), icon: Clock, color: 'bg-amber-500' },
+                    { label: 'Scheduled Classes', value: String(data.totalSchedules || 0), icon: BarChart3, color: 'bg-amber-500' },
                 ]);
+
+                if (data.utilizationPercent) {
+                    setUtilizationPercent(data.utilizationPercent);
+                }
+                if (data.deptWorkload) {
+                    setDeptWorkload(data.deptWorkload);
+                }
             } catch (err) {
                 console.error('Error fetching stats:', err);
-                // Keep default stats if API fails
             } finally {
                 setIsLoading(false);
             }
@@ -98,13 +107,12 @@ export default function AdminDashboard() {
         fetchStats();
     }, []);
 
-    // Chart data - using default values, will be updated if API returns real data
     const utilizationData = {
         labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         datasets: [
             {
                 label: 'Room Utilization (%)',
-                data: [0, 0, 0, 0, 0], // Will be filled with real data from API
+                data: utilizationPercent,
                 backgroundColor: 'rgba(59, 130, 246, 0.5)',
                 borderColor: 'rgb(59, 130, 246)',
                 borderWidth: 2,
@@ -113,12 +121,15 @@ export default function AdminDashboard() {
         ],
     };
 
+    const workloadLabels = Object.keys(deptWorkload);
+    const workloadValues = Object.values(deptWorkload);
+
     const workloadData = {
-        labels: ['Data'], // Placeholder - update based on API
+        labels: workloadLabels.length > 0 ? workloadLabels : ['No Data'],
         datasets: [
             {
-                label: 'Faculty Workload (hrs)',
-                data: [0], // Placeholder - update based on API
+                label: 'Department Workload (hrs/week)',
+                data: workloadValues.length > 0 ? workloadValues : [0],
                 borderColor: 'rgb(168, 85, 247)',
                 backgroundColor: 'rgba(168, 85, 247, 0.1)',
                 borderWidth: 2,
@@ -185,11 +196,11 @@ export default function AdminDashboard() {
                         Generate Next Week Schedule
                         <span className="transform group-hover:translate-x-1 transition-transform">→</span>
                     </button>
-                    <button className="py-4 px-6 bg-purple-50 text-purple-700 rounded-xl font-medium hover:bg-purple-100 transition-colors text-left flex justify-between items-center group">
+                    <button onClick={() => navigate('/courses')} className="py-4 px-6 bg-purple-50 text-purple-700 rounded-xl font-medium hover:bg-purple-100 transition-colors text-left flex justify-between items-center group">
                         Add New Course
                         <span className="transform group-hover:translate-x-1 transition-transform">→</span>
                     </button>
-                    <button className="py-4 px-6 bg-emerald-50 text-emerald-700 rounded-xl font-medium hover:bg-emerald-100 transition-colors text-left flex justify-between items-center group">
+                    <button onClick={() => navigate('/rooms')} className="py-4 px-6 bg-emerald-50 text-emerald-700 rounded-xl font-medium hover:bg-emerald-100 transition-colors text-left flex justify-between items-center group">
                         Manage Classrooms
                         <span className="transform group-hover:translate-x-1 transition-transform">→</span>
                     </button>
@@ -213,10 +224,16 @@ export default function AdminDashboard() {
                                     <h4 className="font-bold mb-1">Success!</h4>
                                     <p className="text-sm">{generateResult.message}</p>
                                     <p className="text-xs mt-2 opacity-80">Generated {generateResult.count} slots.</p>
-                                    <button onClick={() => setIsGenerateModalOpen(false)} className="mt-4 w-full py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">Close</button>
+                                    <button onClick={() => { setIsGenerateModalOpen(false); navigate('/timetable'); }} className="mt-4 w-full py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">View Timetable</button>
                                 </div>
                             ) : (
                                 <>
+                                    {generateError && (
+                                        <div className="p-3 bg-red-50 text-red-700 rounded-xl border border-red-100">
+                                            <p className="text-sm">{generateError}</p>
+                                        </div>
+                                    )}
+
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">Select Department</label>
                                         <select 
@@ -225,10 +242,21 @@ export default function AdminDashboard() {
                                             className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                         >
                                             {departments.map(d => (
-                                                <option key={d._id} value={d._id}>{d.name}</option>
+                                                <option key={d._id} value={d._id}>{d.name} ({d.code})</option>
                                             ))}
                                             {departments.length === 0 && <option value="" disabled>No departments available</option>}
                                         </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Batch Info (e.g., "Year 2 - CS")</label>
+                                        <input 
+                                            type="text"
+                                            placeholder="Leave blank for auto-generated"
+                                            value={formConfig.batchInfo}
+                                            onChange={(e) => setFormConfig({...formConfig, batchInfo: e.target.value})}
+                                            className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
                                     </div>
 
                                     <div>
@@ -268,14 +296,19 @@ export default function AdminDashboard() {
                                     <button 
                                         onClick={async () => {
                                             setIsGenerating(true);
+                                            setGenerateError(null);
                                             try {
-                                                const { data } = await api.post(`/schedules/generate/${formConfig.departmentId}`, {
+                                                const payload = {
                                                     maxClassesPerDay: formConfig.maxClassesPerDay,
                                                     availableRooms: formConfig.availableRooms
-                                                });
+                                                };
+                                                if (formConfig.batchInfo.trim()) {
+                                                    payload.batchInfo = formConfig.batchInfo.trim();
+                                                }
+                                                const { data } = await api.post(`/schedules/generate/${formConfig.departmentId}`, payload);
                                                 setGenerateResult(data);
                                             } catch (err) {
-                                                alert(err.response?.data?.message || err.message || 'Generation failed');
+                                                setGenerateError(err.response?.data?.message || err.message || 'Generation failed');
                                             } finally {
                                                 setIsGenerating(false);
                                             }
