@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogIn, Mail, Lock, User } from 'lucide-react';
+import { LogIn, Lock, User, Waves } from 'lucide-react';
+import OceanBackground from '../components/OceanBackground';
 
 export default function Login() {
     const [loginId, setLoginId] = useState('');
@@ -19,89 +20,102 @@ export default function Login() {
         }
     };
 
-
-
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-blue-900 to-slate-900 relative overflow-hidden">
-            {/* Dynamic visual elements */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-            <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-            <div className="absolute bottom-[-20%] left-[20%] w-[40%] h-[40%] bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+            <OceanBackground />
 
-            <div className="relative w-full max-w-md p-8 bg-white/10 backdrop-blur-lg rounded-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] border border-white/20">
+            {/* Floating decorative elements */}
+            <div className="fixed top-20 left-20 w-2 h-2 rounded-full bg-ocean-400/30 float-animation" style={{ animationDelay: '0s' }}></div>
+            <div className="fixed top-40 right-32 w-3 h-3 rounded-full bg-ocean-300/20 float-animation" style={{ animationDelay: '2s' }}></div>
+            <div className="fixed bottom-32 left-40 w-1.5 h-1.5 rounded-full bg-ocean-500/25 float-animation" style={{ animationDelay: '4s' }}></div>
+
+            {/* Main login card - floating */}
+            <div className="relative z-10 w-full max-w-md p-8 glass rounded-2xl float-slow glow-animation slide-up mx-4">
+                {/* Logo area */}
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">Welcome Back</h1>
-                    <p className="text-blue-100/80">Sign in to access your dashboard</p>
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-ocean-400 to-ocean-600 shadow-lg shadow-ocean-500/30 mb-4">
+                        <Waves className="w-8 h-8 text-white" />
+                    </div>
+                    <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
+                        Welcome Back
+                    </h1>
+                    <p className="text-ocean-200/60 text-sm">
+                        Dive into your Smart Classroom dashboard
+                    </p>
                 </div>
 
                 {error && (
-                    <div className="mb-4 p-4 text-sm text-red-100 bg-red-500/20 border border-red-500/50 rounded-lg backdrop-blur-sm">
+                    <div className="mb-5 p-4 text-sm text-red-200 bg-red-500/15 border border-red-500/30 rounded-xl backdrop-blur-sm slide-up">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-blue-100 mb-2">Login ID</label>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="slide-up" style={{ animationDelay: '0.1s' }}>
+                        <label className="block text-sm font-medium text-ocean-200/80 mb-2">Login ID</label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <User className="h-5 w-5 text-blue-300" />
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <User className="h-4.5 w-4.5 text-ocean-400/60" />
                             </div>
                             <input
                                 type="text"
                                 value={loginId}
                                 onChange={(e) => setLoginId(e.target.value)}
-                                className="block w-full pl-10 pr-3 py-3 border border-blue-300/30 rounded-xl bg-white/5 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                                className="input-ocean"
                                 placeholder="e.g. AD12345, F1234, SD1234567890"
                                 required
                             />
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-blue-100 mb-2">Password</label>
+                    <div className="slide-up" style={{ animationDelay: '0.2s' }}>
+                        <label className="block text-sm font-medium text-ocean-200/80 mb-2">Password</label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Lock className="h-5 w-5 text-blue-300" />
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <Lock className="h-4.5 w-4.5 text-ocean-400/60" />
                             </div>
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="block w-full pl-10 pr-3 py-3 border border-blue-300/30 rounded-xl bg-white/5 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                                className="input-ocean"
                                 placeholder="••••••••"
                                 required
                             />
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-sm">
-                        <label className="flex items-center text-blue-100 cursor-pointer">
-                            <input type="checkbox" className="rounded border-blue-300/30 bg-white/5 text-blue-500 focus:ring-blue-400 mr-2" />
-                            Remember me
+                    <div className="flex items-center justify-between text-sm slide-up" style={{ animationDelay: '0.3s' }}>
+                        <label className="flex items-center text-ocean-200/60 cursor-pointer group">
+                            <input type="checkbox" className="rounded border-ocean-400/30 bg-ocean-900/30 text-ocean-500 focus:ring-ocean-400 mr-2" />
+                            <span className="group-hover:text-ocean-200 transition-colors">Remember me</span>
                         </label>
-                        <Link to="/forgotpassword" className="font-medium text-blue-300 hover:text-blue-200 transition-colors">Forgot password?</Link>
+                        <Link to="/forgotpassword" className="font-medium text-ocean-400 hover:text-ocean-300 transition-colors">
+                            Forgot password?
+                        </Link>
                     </div>
 
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 focus:ring-offset-slate-900 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="btn-ocean w-full flex justify-center items-center py-3.5 text-sm slide-up"
+                        style={{ animationDelay: '0.4s' }}
                     >
                         {isLoading ? (
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            <div className="ocean-spinner" style={{ width: '1.25rem', height: '1.25rem', borderWidth: '2px' }}></div>
                         ) : (
-                            <span className="flex items-center">
+                            <span className="flex items-center gap-2">
                                 Sign In
-                                <LogIn className="ml-2 h-5 w-5" />
+                                <LogIn className="h-4 w-4" />
                             </span>
                         )}
                     </button>
 
-
-
-                    <p className="text-center text-sm text-blue-100/70 mt-4">
-                        Don't have an account? <Link to="/register" className="font-medium text-blue-300 hover:text-white transition-colors">Sign up</Link>
+                    <p className="text-center text-sm text-ocean-200/50 mt-6 slide-up" style={{ animationDelay: '0.5s' }}>
+                        Don't have an account?{' '}
+                        <Link to="/register" className="font-semibold text-ocean-400 hover:text-ocean-300 transition-colors">
+                            Sign up
+                        </Link>
                     </p>
                 </form>
             </div>

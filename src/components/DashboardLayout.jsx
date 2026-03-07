@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
+import OceanBackground from './OceanBackground';
 import {
     LayoutDashboard,
     Calendar,
@@ -7,12 +8,17 @@ import {
     BookOpen,
     MapPin,
     Settings,
-    LogOut
+    LogOut,
+    Waves,
+    Menu,
+    X
 } from 'lucide-react';
+import { useState } from 'react';
 
 export default function DashboardLayout({ children }) {
     const { user, logout } = useAuthStore();
     const navigate = useNavigate();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleLogout = () => {
         logout();
@@ -31,62 +37,102 @@ export default function DashboardLayout({ children }) {
     const allowedNavItems = navItems.filter(item => item.roles.includes(user?.role));
 
     return (
-        <div className="min-h-screen bg-slate-50 flex">
+        <div className="min-h-screen flex relative">
+            <OceanBackground />
+
             {/* Sidebar */}
-            <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col hidden md:flex">
-                <div className="h-16 flex items-center px-6 bg-slate-950">
-                    <h1 className="text-xl font-bold text-white tracking-widest">SMART<span className="text-blue-500">CLASS</span></h1>
+            <aside className={`
+                fixed md:sticky top-0 left-0 z-40 w-72 h-screen flex flex-col
+                glass border-r border-ocean-500/10
+                transition-transform duration-300 ease-in-out
+                ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+            `}>
+                {/* Logo */}
+                <div className="h-18 flex items-center px-6 border-b border-ocean-500/10">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center shadow-lg shadow-ocean-500/20">
+                            <Waves className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-lg font-bold text-white tracking-wide">
+                                SMART<span className="text-ocean-400">CLASS</span>
+                            </h1>
+                            <p className="text-[10px] text-ocean-300/40 uppercase tracking-widest">Scheduler</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="flex-1 py-6 flex flex-col gap-1 px-4">
+                {/* Nav items */}
+                <div className="flex-1 py-6 flex flex-col gap-1.5 px-4 overflow-y-auto">
                     {allowedNavItems.map((item) => (
                         <NavLink
                             key={item.path}
                             to={item.path}
+                            onClick={() => setMobileMenuOpen(false)}
                             className={({ isActive }) =>
-                                `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
-                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
-                                    : 'hover:bg-slate-800 hover:text-white'
+                                `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${isActive
+                                    ? 'bg-gradient-to-r from-ocean-500/20 to-ocean-600/10 text-ocean-300 border border-ocean-500/20 shadow-lg shadow-ocean-500/5'
+                                    : 'text-ocean-200/50 hover:text-ocean-200 hover:bg-ocean-500/5'
                                 }`
                             }
                         >
-                            <item.icon className="h-5 w-5" />
-                            <span className="font-medium">{item.label}</span>
+                            <item.icon className="h-5 w-5 transition-transform group-hover:scale-110" />
+                            <span className="font-medium text-sm">{item.label}</span>
                         </NavLink>
                     ))}
                 </div>
 
-                <div className="p-4 border-t border-slate-800">
+                {/* User section */}
+                <div className="p-4 border-t border-ocean-500/10">
+                    <div className="flex items-center gap-3 px-3 py-2 mb-3">
+                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-ocean-500/20">
+                            {user?.name?.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
+                            <p className="text-xs text-ocean-300/40 truncate">{user?.role}</p>
+                        </div>
+                    </div>
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg w-full text-left hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 rounded-xl w-full text-left text-ocean-200/40 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
                     >
-                        <LogOut className="h-5 w-5" />
-                        <span className="font-medium">Logout</span>
+                        <LogOut className="h-4 w-4" />
+                        <span className="text-sm font-medium">Logout</span>
                     </button>
                 </div>
             </aside>
 
-            {/* Main Content Area */}
-            <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            {/* Mobile menu backdrop */}
+            {mobileMenuOpen && (
+                <div className="fixed inset-0 bg-deep-950/60 backdrop-blur-sm z-30 md:hidden" onClick={() => setMobileMenuOpen(false)} />
+            )}
+
+            {/* Main Content */}
+            <main className="flex-1 flex flex-col min-w-0 relative z-10">
                 {/* Topbar */}
-                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-10">
-                    <h2 className="text-lg font-semibold text-slate-800 capitalize">
-                        {user?.role.toLowerCase()} Portal
-                    </h2>
+                <header className="h-16 glass border-b border-ocean-500/10 flex items-center justify-between px-6 sticky top-0 z-20">
                     <div className="flex items-center gap-4">
-                        <div className="text-right">
-                            <p className="text-sm font-bold text-slate-800">{user?.name}</p>
-                            <p className="text-xs text-slate-500">{user?.email}</p>
+                        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-ocean-300 hover:text-ocean-200">
+                            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                        </button>
+                        <h2 className="text-sm font-semibold text-ocean-200/60 capitalize">
+                            {user?.role?.toLowerCase()} Portal
+                        </h2>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="text-right hidden sm:block">
+                            <p className="text-sm font-bold text-white">{user?.name}</p>
+                            <p className="text-xs text-ocean-300/40">{user?.email}</p>
                         </div>
-                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold border-2 border-blue-200">
-                            {user?.name.charAt(0).toUpperCase()}
+                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-ocean-500/20">
+                            {user?.name?.charAt(0).toUpperCase()}
                         </div>
                     </div>
                 </header>
 
-                {/* Content */}
-                <div className="flex-1 overflow-auto p-8">
+                {/* Content area */}
+                <div className="flex-1 overflow-auto p-6 md:p-8">
                     {children}
                 </div>
             </main>

@@ -1,15 +1,12 @@
 import { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate, Link } from 'react-router-dom';
-import { UserPlus, Mail, Lock, User } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Waves } from 'lucide-react';
+import OceanBackground from '../components/OceanBackground';
 
 export default function Register() {
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        loginId: '',
-        password: '',
-        role: 'STUDENT'
+        name: '', email: '', loginId: '', password: '', role: 'STUDENT'
     });
     const { register, isLoading, error } = useAuthStore();
     const navigate = useNavigate();
@@ -28,133 +25,95 @@ export default function Register() {
         }
     };
 
-
-
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 relative overflow-hidden">
-            {/* Dynamic visual elements */}
-            <div className="absolute top-[10%] right-[-5%] w-[50%] h-[50%] bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-            <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden py-8">
+            <OceanBackground />
 
-            <div className="relative w-full max-w-md p-8 bg-white/10 backdrop-blur-lg rounded-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] border border-white/20">
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">Create Account</h1>
-                    <p className="text-purple-100/80">Join the Smart Classroom network</p>
+            <div className="relative z-10 w-full max-w-md p-8 glass rounded-2xl float-slow glow-animation slide-up mx-4">
+                <div className="text-center mb-6">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-ocean-400 to-ocean-600 shadow-lg shadow-ocean-500/30 mb-4">
+                        <Waves className="w-8 h-8 text-white" />
+                    </div>
+                    <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">Create Account</h1>
+                    <p className="text-ocean-200/60 text-sm">Join the Smart Classroom ocean</p>
                 </div>
 
                 {error && (
-                    <div className="mb-4 p-4 text-sm text-red-100 bg-red-500/20 border border-red-500/50 rounded-lg backdrop-blur-sm">
+                    <div className="mb-4 p-4 text-sm text-red-200 bg-red-500/15 border border-red-500/30 rounded-xl backdrop-blur-sm">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-purple-100 mb-1">Full Name</label>
+                        <label className="block text-sm font-medium text-ocean-200/80 mb-1.5">Full Name</label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <User className="h-5 w-5 text-purple-300" />
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <User className="h-4 w-4 text-ocean-400/60" />
                             </div>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                className="block w-full pl-10 pr-3 py-3 border border-purple-300/30 rounded-xl bg-white/5 text-white placeholder-purple-200/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
-                                placeholder="John Doe"
-                                required
-                            />
+                            <input type="text" name="name" value={formData.name} onChange={handleChange}
+                                className="input-ocean" placeholder="John Doe" required />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-purple-100 mb-1">Email Address</label>
+                        <label className="block text-sm font-medium text-ocean-200/80 mb-1.5">Email Address</label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Mail className="h-5 w-5 text-purple-300" />
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <Mail className="h-4 w-4 text-ocean-400/60" />
                             </div>
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="block w-full pl-10 pr-3 py-3 border border-purple-300/30 rounded-xl bg-white/5 text-white placeholder-purple-200/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
-                                placeholder="you@university.edu"
-                                required
-                            />
+                            <input type="email" name="email" value={formData.email} onChange={handleChange}
+                                className="input-ocean" placeholder="you@university.edu" required />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-purple-100 mb-1">Login ID</label>
+                        <label className="block text-sm font-medium text-ocean-200/80 mb-1.5">Login ID</label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <User className="h-5 w-5 text-purple-300" />
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <User className="h-4 w-4 text-ocean-400/60" />
                             </div>
-                            <input
-                                type="text"
-                                name="loginId"
-                                value={formData.loginId}
-                                onChange={handleChange}
-                                className="block w-full pl-10 pr-3 py-3 border border-purple-300/30 rounded-xl bg-white/5 text-white placeholder-purple-200/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
-                                placeholder="Format: AD+5, F+4, or SD+10 numbers"
-                                required
-                            />
+                            <input type="text" name="loginId" value={formData.loginId} onChange={handleChange}
+                                className="input-ocean" placeholder="AD+5, F+4, or SD+10 digits" required />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-purple-100 mb-1">Password</label>
+                        <label className="block text-sm font-medium text-ocean-200/80 mb-1.5">Password</label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Lock className="h-5 w-5 text-purple-300" />
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <Lock className="h-4 w-4 text-ocean-400/60" />
                             </div>
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="block w-full pl-10 pr-3 py-3 border border-purple-300/30 rounded-xl bg-white/5 text-white placeholder-purple-200/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
-                                placeholder="••••••••"
-                                required
-                                minLength={6}
-                            />
+                            <input type="password" name="password" value={formData.password} onChange={handleChange}
+                                className="input-ocean" placeholder="••••••••" required minLength={6} />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-purple-100 mb-1">Role</label>
-                        <select
-                            name="role"
-                            value={formData.role}
-                            onChange={handleChange}
-                            className="block w-full pl-3 pr-10 py-3 border border-purple-300/30 rounded-xl bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 appearance-none"
-                        >
-                            <option value="STUDENT" className="bg-slate-800">Student</option>
-                            <option value="FACULTY" className="bg-slate-800">Faculty</option>
-                            <option value="ADMIN" className="bg-slate-800">Admin</option>
+                        <label className="block text-sm font-medium text-ocean-200/80 mb-1.5">Role</label>
+                        <select name="role" value={formData.role} onChange={handleChange}
+                            className="select-ocean">
+                            <option value="STUDENT">Student</option>
+                            <option value="FACULTY">Faculty</option>
+                            <option value="ADMIN">Admin</option>
                         </select>
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-purple-600 hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-400 focus:ring-offset-slate-900 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed mt-4"
-                    >
+                    <button type="submit" disabled={isLoading}
+                        className="btn-ocean w-full flex justify-center items-center py-3.5 text-sm mt-2">
                         {isLoading ? (
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            <div className="ocean-spinner" style={{ width: '1.25rem', height: '1.25rem', borderWidth: '2px' }}></div>
                         ) : (
-                            <span className="flex items-center">
+                            <span className="flex items-center gap-2">
                                 Create Account
-                                <UserPlus className="ml-2 h-5 w-5" />
+                                <UserPlus className="h-4 w-4" />
                             </span>
                         )}
                     </button>
 
-
-
-                    <p className="text-center text-sm text-purple-100/70 mt-4">
-                        Already have an account? <Link to="/login" className="font-medium text-purple-300 hover:text-white transition-colors">Sign in</Link>
+                    <p className="text-center text-sm text-ocean-200/50 mt-4">
+                        Already have an account?{' '}
+                        <Link to="/login" className="font-semibold text-ocean-400 hover:text-ocean-300 transition-colors">Sign in</Link>
                     </p>
                 </form>
             </div>

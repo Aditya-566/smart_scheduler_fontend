@@ -1,94 +1,93 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
-import { Calendar, Search, MapPin, Clock } from 'lucide-react';
 import api from '../services/api';
+import { Calendar, Clock, BookOpen, MapPin } from 'lucide-react';
 
 export default function StudentDashboard() {
     const { user } = useAuthStore();
     const [schedules, setSchedules] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [upNext, setUpNext] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const today = new Date().getDay();
+    const now = new Date();
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
     useEffect(() => {
-        const fetchSchedules = async () => {
+        (async () => {
             try {
                 const { data } = await api.get('/schedules');
                 setSchedules(data);
-                
-                // Extremely simple logic to find "Next" class for demo purposes
-                // In production, this should compare with current time and day
-                const currentDayOfWeek = new Date().getDay();
-                const todaysSchedules = data.filter(item => item.timeSlot?.dayOfWeek === currentDayOfWeek);
-                if (todaysSchedules.length > 0) {
-                    todaysSchedules.sort((a, b) => a.timeSlot.startTime.localeCompare(b.timeSlot.startTime));
-                    setUpNext(todaysSchedules[0]);
-                }
-            } catch (error) {
-                console.error("Error fetching schedules:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+            } catch (e) { console.error(e); }
+            finally { setIsLoading(false); }
+        })();
+    }, []);
 
-        if (user) {
-            fetchSchedules();
-        }
-    }, [user]);
+    const todayClasses = schedules
+        .filter(s => s.timeSlot?.dayOfWeek === today)
+        .sort((a, b) => (a.timeSlot?.startTime || '').localeCompare(b.timeSlot?.startTime || ''));
+
+    const nextClass = todayClasses.find(s => s.timeSlot?.startTime > currentTime);
 
     return (
-        <div className="space-y-6">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white shadow-lg relative overflow-hidden">
-                <div className="relative z-10">
-                    <h1 className="text-3xl font-bold mb-2">Hello, {user?.name.split(' ')[0]} 👋</h1>
-                    <p className="text-blue-100 max-w-lg mb-6">Check your upcoming classes or find an empty classroom for self-study right now.</p>
-
-                    <div className="flex flex-wrap gap-4">
-                        <button className="bg-white text-blue-600 px-6 py-3 rounded-xl font-bold shadow-md hover:shadow-lg hover:bg-blue-50 transition-all flex items-center">
-                            <Calendar className="mr-2 h-5 w-5" />
-                            My Timetable
-                        </button>
-                        <button className="bg-blue-700/50 backdrop-blur-md border border-white/20 text-white px-6 py-3 rounded-xl font-bold shadow-md hover:bg-blue-700/70 transition-all flex items-center">
-                            <Search className="mr-2 h-5 w-5" />
-                            Find Free Classrooms
-                        </button>
-                    </div>
-                </div>
-
-                {/* Decorative background shapes */}
-                <div className="absolute top-0 right-0 -translate-y-12 translate-x-8 w-64 h-64 bg-white opacity-5 rounded-full blur-2xl"></div>
-                <div className="absolute bottom-0 right-32 translate-y-1/2 w-48 h-48 bg-white opacity-10 rounded-full blur-xl"></div>
+        <div className="space-y-6 fade-in">
+            <div>
+                <h1 className="text-2xl font-bold text-white">Hey, {user?.name}! 🌊</h1>
+                <p className="text-ocean-200/50 text-sm mt-1">{DAYS[today]}'s schedule is ready for you.</p>
             </div>
 
-            <div className="mt-8">
-                <h3 className="text-xl font-bold text-slate-800 mb-4">Up Next</h3>
-                {loading ? (
-                    <div className="text-slate-500">Loading your schedule...</div>
-                ) : upNext ? (
-                    <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
-                        <div className="flex items-center gap-6">
-                            <div className="bg-blue-50 text-blue-600 p-4 rounded-2xl text-center min-w-[100px]">
-                                <p className="text-sm font-bold uppercase">Today</p>
-                                <p className="text-2xl font-black">{upNext.timeSlot?.startTime}</p>
-                            </div>
-                            <div>
-                                <h4 className="text-xl font-bold text-slate-900 mb-1">{upNext.course?.name || 'Class'} ({upNext.course?.code || ''})</h4>
-                                <div className="flex items-center text-slate-500 text-sm mt-1">
-                                    <MapPin className="h-4 w-4 mr-1" />
-                                    Room {upNext.room?.number || 'TBA'}
-                                </div>
-                                <div className="flex items-center text-slate-500 text-sm mt-1">
-                                    <Clock className="h-4 w-4 mr-1" />
-                                    {upNext.timeSlot?.startTime} - {upNext.timeSlot?.endTime}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="text-center md:text-right">
-                            <p className="text-sm text-slate-500 font-medium mb-1">{upNext.faculty?.name ? `Prof. ${upNext.faculty.name}` : 'Faculty TBA'}</p>
-                        </div>
+            {/* Next Class Highlight */}
+            {nextClass && (
+                <div className="glass-card rounded-2xl p-6 glow-animation border-ocean-400/20">
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                        <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Next Up</p>
+                    </div>
+                    <h2 className="text-xl font-bold text-white mb-2">{nextClass.course?.name}</h2>
+                    <div className="flex flex-wrap gap-4 text-sm text-ocean-200/60">
+                        <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-ocean-400" />{nextClass.timeSlot?.startTime} - {nextClass.timeSlot?.endTime}</span>
+                        <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-ocean-400" />Room {nextClass.room?.number}</span>
+                        <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-ocean-400" />{nextClass.course?.code}</span>
+                    </div>
+                </div>
+            )}
+
+            {/* Today's Classes */}
+            <div className="glass-card rounded-2xl p-6">
+                <h3 className="text-base font-bold text-white mb-4 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-ocean-400" />
+                    Today's Classes
+                </h3>
+                {isLoading ? (
+                    <div className="flex justify-center py-8"><div className="ocean-spinner"></div></div>
+                ) : todayClasses.length === 0 ? (
+                    <div className="text-center py-8 text-ocean-200/40">
+                        <Calendar className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                        <p>No classes scheduled for today. Enjoy your free day! 🏖️</p>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm text-center text-slate-500">
-                        No upcoming classes scheduled for today. Enjoy your free time!
+                    <div className="space-y-3">
+                        {todayClasses.map(s => {
+                            const isPast = s.timeSlot?.endTime < currentTime;
+                            const isCurrent = s.timeSlot?.startTime <= currentTime && s.timeSlot?.endTime >= currentTime;
+                            return (
+                                <div key={s._id} className={`glass-light rounded-xl p-4 flex justify-between items-center ${isPast ? 'opacity-40' : ''} ${isCurrent ? 'border-ocean-400/30 glow-animation' : ''}`}>
+                                    <div className="flex items-center gap-4">
+                                        <div className="text-center min-w-[60px]">
+                                            <p className={`font-bold text-sm ${isCurrent ? 'text-ocean-300' : 'text-ocean-200/60'}`}>{s.timeSlot?.startTime}</p>
+                                            <p className="text-ocean-400/30 text-xs">{s.timeSlot?.endTime}</p>
+                                        </div>
+                                        <div className="w-px h-10 bg-ocean-500/20"></div>
+                                        <div>
+                                            <p className="font-semibold text-white text-sm">{s.course?.name}</p>
+                                            <p className="text-ocean-200/40 text-xs mt-0.5">Room {s.room?.number} • {s.faculty?.name || 'Faculty TBA'}</p>
+                                        </div>
+                                    </div>
+                                    {isCurrent && <span className="px-2.5 py-1 rounded-lg bg-ocean-500/15 text-ocean-300 text-xs font-bold">NOW</span>}
+                                    {isPast && <span className="px-2.5 py-1 rounded-lg bg-ocean-500/5 text-ocean-400/30 text-xs">Done</span>}
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>
