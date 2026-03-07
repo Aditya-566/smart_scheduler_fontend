@@ -30,7 +30,7 @@ export default function DashboardLayout({ children }) {
         { label: 'Timetable', icon: Calendar, path: '/timetable', roles: ['ADMIN', 'FACULTY', 'STUDENT'] },
         { label: 'Users', icon: Users, path: '/users', roles: ['ADMIN'] },
         { label: 'Courses', icon: BookOpen, path: '/courses', roles: ['ADMIN'] },
-        { label: 'Rooms', icon: MapPin, path: '/rooms', roles: ['ADMIN', 'STUDENT'] },
+        { label: 'Rooms', icon: MapPin, path: '/rooms', roles: ['ADMIN'] },
         { label: 'Settings', icon: Settings, path: '/settings', roles: ['ADMIN', 'FACULTY', 'STUDENT'] },
     ];
 

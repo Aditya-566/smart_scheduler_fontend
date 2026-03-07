@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuthStore } from '../store/useAuthStore';
-import { Calendar as CalendarIcon, Clock, MapPin, User as UserIcon, X, Trash2, AlertTriangle } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, MapPin, User as UserIcon, X, Trash2, AlertTriangle, UserPlus, Coffee } from 'lucide-react';
 
 export default function Timetable() {
     const { user } = useAuthStore();
@@ -28,7 +28,15 @@ export default function Timetable() {
     const [selected, setSelected] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    // Faculty quick-assign modal
+    const [isFacultyModalOpen, setIsFacultyModalOpen] = useState(false);
+    const [facultyTarget, setFacultyTarget] = useState(null);
+    const [selectedFaculty, setSelectedFaculty] = useState('');
+    const [quickFacultyList, setQuickFacultyList] = useState([]);
+    const [isFacultyAssigning, setIsFacultyAssigning] = useState(false);
+
     const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const LUNCH_SLOT = '12:00 - 13:00';
     const TIME_SLOTS = [
         '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00',
         '12:00 - 13:00', '13:00 - 14:00', '14:00 - 15:00', '15:00 - 16:00', '16:00 - 17:00'
@@ -109,6 +117,30 @@ export default function Timetable() {
         try { await api.delete('/schedules/all'); fetchSchedules(); } catch (e) { alert('Failed to clear'); }
     };
 
+    // Quick faculty assign
+    const openFacultyModal = async (schedule, e) => {
+        e.stopPropagation();
+        setFacultyTarget(schedule);
+        setSelectedFaculty('');
+        setIsFacultyModalOpen(true);
+        try {
+            const { data } = await api.get('/schedules/faculty');
+            setQuickFacultyList(data);
+        } catch (err) { console.error(err); }
+    };
+
+    const handleFacultyAssign = async () => {
+        if (!selectedFaculty || !facultyTarget) return;
+        setIsFacultyAssigning(true);
+        try {
+            await api.put(`/schedules/${facultyTarget._id}`, { faculty: selectedFaculty });
+            setIsFacultyModalOpen(false);
+            setFacultyTarget(null);
+            fetchSchedules();
+        } catch (e) { alert(e.response?.data?.message || 'Failed to assign faculty'); }
+        finally { setIsFacultyAssigning(false); }
+    };
+
     const cardColors = [
         { bg: 'rgba(0,178,203,0.12)', border: 'rgba(0,178,203,0.2)', title: '#67e8f9', code: '#00b2cb' },
         { bg: 'rgba(168,85,247,0.12)', border: 'rgba(168,85,247,0.2)', title: '#c084fc', code: '#a855f7' },
@@ -159,43 +191,70 @@ export default function Timetable() {
                             </tr>
                         </thead>
                         <tbody>
-                            {TIME_SLOTS.map((time, ti) => (
-                                <tr key={ti} className="group">
-                                    <td className="p-3 border-b border-r border-ocean-500/8 text-ocean-300/40 font-medium text-xs text-center whitespace-nowrap" style={{ background: 'rgba(0,178,203,0.02)' }}>{time}</td>
-                                    {DAYS.slice(1, 6).map((_, di) => {
-                                        const dayIdx = di + 1;
-                                        const item = getScheduleForSlot(dayIdx, time);
-                                        const c = item ? getColor(item.course?.code) : null;
-                                        return (
-                                            <td key={dayIdx} className="p-1.5 border-b border-ocean-500/6 border-r last:border-r-0 relative group/cell hover:bg-ocean-500/3 transition-colors h-[100px] align-top">
-                                                {item ? (
-                                                    <div onClick={() => setSelected(item)}
-                                                        className="h-full rounded-xl p-3 flex flex-col justify-between cursor-pointer transition-all duration-300 hover:scale-[1.02]"
-                                                        style={{ background: c.bg, border: `1px solid ${c.border}` }}>
-                                                        <div>
-                                                            <div className="font-bold text-sm mb-0.5 leading-tight line-clamp-2" style={{ color: c.title }}>{item.course?.name || 'Class'}</div>
-                                                            <div className="text-xs font-semibold" style={{ color: c.code }}>{item.course?.code}</div>
+                            {TIME_SLOTS.map((time, ti) => {
+                                const isLunch = time === LUNCH_SLOT;
+                                return (
+                                    <tr key={ti} className="group">
+                                        <td className={`p-3 border-b border-r border-ocean-500/8 font-medium text-xs text-center whitespace-nowrap ${isLunch ? 'text-amber-400/60' : 'text-ocean-300/40'}`}
+                                            style={{ background: isLunch ? 'rgba(251,191,36,0.04)' : 'rgba(0,178,203,0.02)' }}>
+                                            {isLunch ? <span className="flex items-center justify-center gap-1"><Coffee className="w-3 h-3" />{time}</span> : time}
+                                        </td>
+                                        {DAYS.slice(1, 6).map((_, di) => {
+                                            const dayIdx = di + 1;
+                                            if (isLunch) {
+                                                return (
+                                                    <td key={dayIdx} className="p-1.5 border-b border-ocean-500/6 border-r last:border-r-0 h-[60px] align-middle text-center"
+                                                        style={{ background: 'rgba(251,191,36,0.03)' }}>
+                                                        <span className="text-xs text-amber-400/30 italic">Lunch Break</span>
+                                                    </td>
+                                                );
+                                            }
+                                            const item = getScheduleForSlot(dayIdx, time);
+                                            const c = item ? getColor(item.course?.code) : null;
+                                            return (
+                                                <td key={dayIdx} className="p-1.5 border-b border-ocean-500/6 border-r last:border-r-0 relative group/cell hover:bg-ocean-500/3 transition-colors h-[100px] align-top">
+                                                    {item ? (
+                                                        <div onClick={() => setSelected(item)}
+                                                            className="h-full rounded-xl p-3 flex flex-col justify-between cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+                                                            style={{ background: c.bg, border: `1px solid ${c.border}` }}>
+                                                            <div>
+                                                                <div className="font-bold text-sm mb-0.5 leading-tight line-clamp-2" style={{ color: c.title }}>{item.course?.name || 'Class'}</div>
+                                                                <div className="text-xs font-semibold" style={{ color: c.code }}>{item.course?.code}</div>
+                                                            </div>
+                                                            <div className="space-y-0.5 text-xs text-ocean-200/50">
+                                                                <div className="flex items-center gap-1"><MapPin className="w-3 h-3" /><span className="truncate">Room {item.room?.number || 'TBA'}</span></div>
+                                                                {item.faculty?.name ? (
+                                                                    <div className="flex items-center gap-1"><UserIcon className="w-3 h-3" /><span className="truncate">{item.faculty.name}</span></div>
+                                                                ) : (
+                                                                    <div className="flex items-center gap-1">
+                                                                        <UserIcon className="w-3 h-3 text-amber-400/60" />
+                                                                        <span className="text-amber-400/60">TBA</span>
+                                                                        {user?.role === 'ADMIN' && (
+                                                                            <button onClick={(e) => openFacultyModal(item, e)}
+                                                                                className="ml-auto px-1.5 py-0.5 rounded text-[10px] font-bold bg-ocean-500/15 text-ocean-300 hover:bg-ocean-500/25 transition-colors flex items-center gap-0.5">
+                                                                                <UserPlus className="w-2.5 h-2.5" /> Assign
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div className="space-y-0.5 text-xs text-ocean-200/50">
-                                                            <div className="flex items-center gap-1"><MapPin className="w-3 h-3" /><span className="truncate">Room {item.room?.number || 'TBA'}</span></div>
-                                                            <div className="flex items-center gap-1"><UserIcon className="w-3 h-3" /><span className="truncate">{item.faculty?.name || 'TBA'}</span></div>
+                                                    ) : (
+                                                        <div className="opacity-0 group-hover/cell:opacity-100 flex items-center justify-center h-full transition-opacity">
+                                                            {user?.role === 'ADMIN' && (
+                                                                <button onClick={() => openAssignModal(dayIdx, time)}
+                                                                    className="text-xs font-medium text-ocean-300/40 border border-dashed border-ocean-400/20 rounded px-2 py-1 hover:text-ocean-300 hover:border-ocean-400/40 transition-colors">
+                                                                    + Assign
+                                                                </button>
+                                                            )}
                                                         </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="opacity-0 group-hover/cell:opacity-100 flex items-center justify-center h-full transition-opacity">
-                                                        {user?.role === 'ADMIN' && (
-                                                            <button onClick={() => openAssignModal(dayIdx, time)}
-                                                                className="text-xs font-medium text-ocean-300/40 border border-dashed border-ocean-400/20 rounded px-2 py-1 hover:text-ocean-300 hover:border-ocean-400/40 transition-colors">
-                                                                + Assign
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
-                            ))}
+                                                    )}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
@@ -330,6 +389,38 @@ export default function Timetable() {
                                         : <><Trash2 className="w-3.5 h-3.5" /> Remove from Timetable</>}
                                 </button>
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Quick Faculty Assign Modal */}
+            {isFacultyModalOpen && facultyTarget && (
+                <div className="modal-overlay">
+                    <div className="modal-content max-w-sm">
+                        <div className="p-6 border-b border-ocean-500/10 flex justify-between items-center">
+                            <div>
+                                <h2 className="text-lg font-bold text-white flex items-center gap-2"><UserPlus className="w-5 h-5 text-ocean-400" /> Assign Faculty</h2>
+                                <p className="text-xs text-ocean-200/40 mt-1">{facultyTarget.course?.name} ({facultyTarget.course?.code})</p>
+                            </div>
+                            <button onClick={() => setIsFacultyModalOpen(false)} className="text-ocean-300/50 hover:text-ocean-200"><X className="h-5 w-5" /></button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-ocean-200/70 mb-1.5">Select Faculty</label>
+                                <select value={selectedFaculty} onChange={e => setSelectedFaculty(e.target.value)} className="select-ocean">
+                                    <option value="">Choose a faculty member</option>
+                                    {quickFacultyList.map(f => <option key={f._id} value={f._id}>{f.name} ({f.email})</option>)}
+                                </select>
+                            </div>
+                            <div className="glass-light rounded-xl p-3 space-y-1.5">
+                                <p className="text-xs text-ocean-200/40">Schedule Info</p>
+                                <p className="text-sm text-ocean-200/70">📍 Room {facultyTarget.room?.number} • {facultyTarget.timeSlot ? `${DAYS[facultyTarget.timeSlot.dayOfWeek]}, ${facultyTarget.timeSlot.startTime} - ${facultyTarget.timeSlot.endTime}` : ''}</p>
+                            </div>
+                            <button onClick={handleFacultyAssign} disabled={!selectedFaculty || isFacultyAssigning}
+                                className="btn-ocean w-full py-3 text-sm flex justify-center items-center gap-2">
+                                {isFacultyAssigning ? <div className="ocean-spinner" style={{ width: '1.25rem', height: '1.25rem', borderWidth: '2px' }}></div> : <><UserPlus className="w-4 h-4" /> Assign Faculty</>}
+                            </button>
                         </div>
                     </div>
                 </div>
