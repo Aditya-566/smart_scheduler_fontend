@@ -1,4 +1,5 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-scroll';
 import { useAuthStore } from '../store/useAuthStore';
 import OceanBackground from './OceanBackground';
 import {
@@ -26,13 +27,12 @@ export default function DashboardLayout({ children }) {
     };
 
     const navItems = [
-        { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', roles: ['ADMIN', 'FACULTY', 'STUDENT'] },
-        { label: 'Timetable', icon: Calendar, path: '/timetable', roles: ['ADMIN', 'FACULTY', 'STUDENT'] },
-        { label: 'My Courses', icon: BookOpen, path: '/my-courses', roles: ['FACULTY'] },
-        { label: 'Users', icon: Users, path: '/users', roles: ['ADMIN'] },
-        { label: 'Courses', icon: BookOpen, path: '/courses', roles: ['ADMIN'] },
-        { label: 'Rooms', icon: MapPin, path: '/rooms', roles: ['ADMIN'] },
-        { label: 'Settings', icon: Settings, path: '/settings', roles: ['ADMIN'] },
+        { label: 'Dashboard', icon: LayoutDashboard, id: 'dashboard-overview', roles: ['ADMIN', 'FACULTY', 'STUDENT'] },
+        { label: 'Timetable', icon: Calendar, id: 'timetable', roles: ['ADMIN', 'FACULTY', 'STUDENT'] },
+        { label: 'My Courses', icon: BookOpen, id: 'my-courses', roles: ['FACULTY'] },
+        { label: 'Courses', icon: BookOpen, id: 'courses', roles: ['ADMIN'] },
+        { label: 'Rooms', icon: MapPin, id: 'rooms', roles: ['ADMIN'] },
+        { label: 'Settings', icon: Settings, id: 'settings', roles: ['ADMIN'] },
     ];
 
     const allowedNavItems = navItems.filter(item => item.roles.includes(user?.role));
@@ -66,20 +66,20 @@ export default function DashboardLayout({ children }) {
                 {/* Nav items */}
                 <div className="flex-1 py-6 flex flex-col gap-1.5 px-4 overflow-y-auto">
                     {allowedNavItems.map((item) => (
-                        <NavLink
-                            key={item.path}
-                            to={item.path}
+                        <Link
+                            key={item.id}
+                            to={item.id}
+                            spy={true}
+                            smooth={true}
+                            offset={-80}
+                            duration={600}
+                            activeClass="bg-gradient-to-r from-ocean-500/20 to-ocean-600/10 text-ocean-300 border border-ocean-500/20 !opacity-100"
                             onClick={() => setMobileMenuOpen(false)}
-                            className={({ isActive }) =>
-                                `nav-item-3d flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${isActive
-                                    ? 'active bg-gradient-to-r from-ocean-500/20 to-ocean-600/10 text-ocean-300 border border-ocean-500/20'
-                                    : 'text-ocean-200/50 hover:text-ocean-200 hover:bg-ocean-500/5'
-                                }`
-                            }
+                            className="nav-item-3d flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group text-ocean-200/50 hover:text-ocean-200 hover:bg-ocean-500/5 cursor-pointer border border-transparent"
                         >
                             <item.icon className="h-5 w-5 transition-transform group-hover:scale-110" />
                             <span className="font-medium text-sm">{item.label}</span>
-                        </NavLink>
+                        </Link>
                     ))}
                 </div>
 

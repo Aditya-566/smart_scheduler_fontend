@@ -70,7 +70,7 @@ export default function FacultyDashboard() {
                         <BookOpen className="w-5 h-5 text-ocean-400" /> My Assigned Courses
                     </h3>
                     {myCourses.length > 0 && (
-                        <button onClick={() => navigate('/my-courses')}
+                        <button onClick={() => { import('react-scroll').then(mod => mod.scroller.scrollTo('my-courses', { smooth: true, offset: -80, duration: 600 })) }}
                             className="text-xs text-ocean-300/60 hover:text-ocean-300 flex items-center gap-1 transition-colors">
                             View All <ArrowRight className="w-3 h-3" />
                         </button>

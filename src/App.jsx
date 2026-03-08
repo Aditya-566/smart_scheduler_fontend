@@ -5,13 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import DashboardLayout from './components/DashboardLayout';
-import Dashboard from './pages/Dashboard';
-import Timetable from './pages/Timetable';
-import Courses from './pages/Courses';
-import FacultyCourses from './pages/FacultyCourses';
-import Rooms from './pages/Rooms';
-import Settings from './pages/Settings';
+import MainScrollApp from './pages/MainScrollApp';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -43,64 +37,12 @@ function App() {
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/resetpassword/:token" element={<ResetPassword />} />
 
-        {/* Protected Routes wrapped in DashboardLayout */}
+        {/* Unified Single-Page Scrolling Dashboard */}
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/timetable"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Timetable />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/my-courses"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <FacultyCourses />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/courses"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Courses />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/rooms"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Rooms />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Settings />
-              </DashboardLayout>
+              <MainScrollApp />
             </ProtectedRoute>
           }
         />
