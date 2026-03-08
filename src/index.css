@@ -35,19 +35,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Animated SVG water waves at the bottom */
-.ocean-waves {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 200px;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.35;
-}
-
-/* Floating bubbles */
+/* ============= ANIMATIONS ============= */
 @keyframes bubbleRise {
   0% { transform: translateY(100vh) scale(0.3); opacity: 0; }
   10% { opacity: 0.6; }
@@ -55,25 +43,22 @@ body {
   100% { transform: translateY(-10vh) scale(1); opacity: 0; }
 }
 
-.bubble {
-  position: fixed;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(0, 178, 203, 0.4), rgba(0, 178, 203, 0.05));
-  border: 1px solid rgba(0, 178, 203, 0.15);
-  pointer-events: none;
-  z-index: 0;
-  animation: bubbleRise linear infinite;
-}
-
-/* Floating / bobbing animation for cards */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-6px) rotate(0.5deg); }
+  50% { transform: translateY(-10px) rotate(0deg); }
+  75% { transform: translateY(-4px) rotate(-0.5deg); }
 }
 
 @keyframes floatSlow {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-5px); }
+}
+
+@keyframes floatBob {
+  0%, 100% { transform: translateY(0px) rotate(-0.3deg); }
+  33% { transform: translateY(-4px) rotate(0.3deg); }
+  66% { transform: translateY(-7px) rotate(-0.3deg); }
 }
 
 @keyframes shimmer {
@@ -112,10 +97,25 @@ body {
   to { opacity: 1; }
 }
 
-/* Water ripple effect on hover */
-@keyframes ripple {
+@keyframes rippleExpand {
   0% { transform: scale(0); opacity: 0.5; }
   100% { transform: scale(4); opacity: 0; }
+}
+
+@keyframes oceanPulse {
+  0%, 100% { box-shadow: 0 4px 15px rgba(0, 178, 203, 0.3), inset 0 0 0 rgba(0, 220, 255, 0); }
+  50% { box-shadow: 0 4px 25px rgba(0, 178, 203, 0.5), inset 0 0 15px rgba(0, 220, 255, 0.05); }
+}
+
+@keyframes borderFlow {
+  0% { border-color: rgba(0, 178, 203, 0.2); }
+  50% { border-color: rgba(0, 220, 255, 0.4); }
+  100% { border-color: rgba(0, 178, 203, 0.2); }
+}
+
+@keyframes waterShine {
+  0% { left: -100%; }
+  100% { left: 200%; }
 }
 
 /* ============= UTILITY CLASSES ============= */
@@ -153,6 +153,14 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 178, 203, 0.12);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-light:hover {
+  background: rgba(0, 178, 203, 0.12);
+  border-color: rgba(0, 178, 203, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 178, 203, 0.1), inset 0 1px 0 rgba(0, 220, 255, 0.05);
+  transform: translateY(-1px);
 }
 
 .glass-card {
@@ -161,13 +169,32 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(0, 178, 203, 0.12);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: floatBob 8s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 220, 255, 0.03), transparent);
+  transition: none;
+  pointer-events: none;
+}
+
+.glass-card:hover::before {
+  animation: waterShine 0.8s ease-out;
 }
 
 .glass-card:hover {
-  border-color: rgba(0, 178, 203, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 178, 203, 0.15), 0 4px 24px rgba(0, 0, 0, 0.2);
-  transform: translateY(-2px);
+  border-color: rgba(0, 178, 203, 0.35);
+  box-shadow: 0 12px 40px rgba(0, 178, 203, 0.15), 0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(0, 220, 255, 0.08);
+  transform: translateY(-4px);
 }
 
 /* ============= BUTTONS ============= */
@@ -179,26 +206,65 @@ body {
   border-radius: 12px;
   padding: 0.75rem 1.5rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 178, 203, 0.3);
+  animation: floatBob 7s ease-in-out infinite;
+}
+
+/* Water ripple on click */
+.btn-ocean::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: none;
+  pointer-events: none;
+}
+
+.btn-ocean:active::after {
+  animation: rippleExpand 0.6s ease-out;
+}
+
+/* Shimmer sweep on hover */
+.btn-ocean::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  pointer-events: none;
+  transition: none;
+}
+
+.btn-ocean:hover::before {
+  animation: waterShine 0.6s ease-out;
 }
 
 .btn-ocean:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 178, 203, 0.5);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 30px rgba(0, 178, 203, 0.5), 0 0 40px rgba(0, 178, 203, 0.15);
   background: linear-gradient(135deg, #00c4e0, #0090b8);
 }
 
 .btn-ocean:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 10px rgba(0, 178, 203, 0.4);
 }
 
 .btn-ocean:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
+  animation: none;
 }
 
 .btn-ocean-outline {
@@ -209,13 +275,31 @@ body {
   border-radius: 12px;
   padding: 0.75rem 1.5rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ocean-outline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 178, 203, 0.1), transparent);
+  pointer-events: none;
+}
+
+.btn-ocean-outline:hover::before {
+  animation: waterShine 0.6s ease-out;
 }
 
 .btn-ocean-outline:hover {
   background: rgba(0, 178, 203, 0.1);
   border-color: rgba(0, 178, 203, 0.7);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 178, 203, 0.15), inset 0 0 20px rgba(0, 178, 203, 0.05);
 }
 
 .btn-danger {
@@ -226,13 +310,19 @@ body {
   border-radius: 12px;
   padding: 0.75rem 1.5rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-danger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+}
+
+.btn-danger:active {
+  transform: translateY(0) scale(0.98);
 }
 
 /* ============= INPUTS ============= */
@@ -245,18 +335,31 @@ body {
   border-radius: 12px;
   color: #e6f7fa;
   font-size: 0.875rem;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+  position: relative;
 }
 
 .input-ocean::placeholder {
   color: rgba(179, 232, 240, 0.4);
+  transition: color 0.3s ease;
+}
+
+.input-ocean:hover {
+  border-color: rgba(0, 178, 203, 0.4);
+  background: rgba(0, 178, 203, 0.08);
+  box-shadow: 0 0 20px rgba(0, 178, 203, 0.05);
+}
+
+.input-ocean:hover::placeholder {
+  color: rgba(179, 232, 240, 0.6);
 }
 
 .input-ocean:focus {
   border-color: #00b2cb;
-  box-shadow: 0 0 0 3px rgba(0, 178, 203, 0.15), 0 0 20px rgba(0, 178, 203, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 178, 203, 0.15), 0 0 30px rgba(0, 178, 203, 0.1), inset 0 0 10px rgba(0, 178, 203, 0.03);
   background: rgba(0, 178, 203, 0.1);
+  animation: borderFlow 3s ease infinite;
 }
 
 .select-ocean {
@@ -267,9 +370,10 @@ body {
   border-radius: 12px;
   color: #e6f7fa;
   font-size: 0.875rem;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   appearance: none;
+  cursor: pointer;
 }
 
 .select-ocean option {
@@ -277,9 +381,16 @@ body {
   color: #e6f7fa;
 }
 
+.select-ocean:hover {
+  border-color: rgba(0, 178, 203, 0.4);
+  background: rgba(0, 178, 203, 0.08);
+  box-shadow: 0 0 15px rgba(0, 178, 203, 0.05);
+}
+
 .select-ocean:focus {
   border-color: #00b2cb;
-  box-shadow: 0 0 0 3px rgba(0, 178, 203, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 178, 203, 0.15), 0 0 25px rgba(0, 178, 203, 0.08);
+  animation: borderFlow 3s ease infinite;
 }
 
 /* ============= SCROLLBAR ============= */
@@ -351,10 +462,20 @@ body {
   font-size: 0.875rem;
   border-bottom: 1px solid rgba(0, 178, 203, 0.06);
   color: rgba(230, 247, 250, 0.8);
+  transition: all 0.3s ease;
+}
+
+.ocean-table tbody tr {
+  transition: all 0.3s ease;
 }
 
 .ocean-table tbody tr:hover {
-  background: rgba(0, 178, 203, 0.05);
+  background: rgba(0, 178, 203, 0.08);
+  box-shadow: inset 3px 0 0 rgba(0, 178, 203, 0.5);
+}
+
+.ocean-table tbody tr:hover td {
+  color: rgba(230, 247, 250, 1);
 }
 
 /* ============= LOADING SPINNER ============= */
@@ -373,7 +494,10 @@ body {
 
 /* ============= RESPONSIVE ============= */
 @media (max-width: 768px) {
-  .ocean-waves {
-    height: 120px;
+  .glass-card {
+    animation: none; /* disable bob on mobile for performance */
+  }
+  .btn-ocean {
+    animation: none;
   }
 }
