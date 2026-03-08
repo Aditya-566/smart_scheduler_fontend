@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Settings as SettingsIcon, Plus, Trash2, Clock, X } from 'lucide-react';
+import ScrollReveal from '../components/ScrollReveal';
 
 export default function Settings() {
     const [departments, setDepartments] = useState([]);
@@ -41,13 +42,16 @@ export default function Settings() {
     };
 
     return (
-        <div className="space-y-6 fade-in">
+        <div className="space-y-6 fade-in overflow-x-hidden">
+            <ScrollReveal direction="down" delay={0.1}>
             <div>
                 <h1 className="text-2xl font-bold text-white flex items-center gap-2"><SettingsIcon className="text-ocean-400" /> Settings</h1>
                 <p className="text-ocean-200/50 text-sm mt-1">Manage departments, time slots, and system configuration.</p>
             </div>
+            </ScrollReveal>
 
             {/* Departments */}
+            <ScrollReveal direction="left" delay={0.2}>
             <div className="glass-card rounded-2xl p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-base font-bold text-white">Departments</h3>
@@ -78,8 +82,10 @@ export default function Settings() {
                     </div>
                 )}
             </div>
+            </ScrollReveal>
 
             {/* Time Slots */}
+            <ScrollReveal direction="right" delay={0.3}>
             <div className="glass-card rounded-2xl p-6">
                 <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
                     <Clock className="w-5 h-5 text-ocean-400" /> Time Slots
@@ -96,9 +102,11 @@ export default function Settings() {
                     {isSeeding ? <div className="ocean-spinner" style={{ width: '1rem', height: '1rem', borderWidth: '2px' }}></div> : <><Clock className="w-4 h-4" /> Seed Default Slots (Mon-Fri)</>}
                 </button>
             </div>
+            </ScrollReveal>
 
             {/* Add Department Modal */}
             {isDeptModalOpen && (
+                <ScrollReveal direction="up" delay={0.1}>
                 <div className="modal-overlay">
                     <div className="modal-content max-w-md">
                         <div className="p-6 border-b border-ocean-500/10 flex justify-between items-center">
@@ -118,6 +126,7 @@ export default function Settings() {
                         </form>
                     </div>
                 </div>
+                </ScrollReveal>
             )}
         </div>
     );

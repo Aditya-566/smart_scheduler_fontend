@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { MapPin, Plus, Trash2, X, Wifi, Monitor, Wind } from 'lucide-react';
+import ScrollReveal from '../components/ScrollReveal';
 
 export default function Rooms() {
     const [rooms, setRooms] = useState([]);
@@ -51,7 +52,8 @@ export default function Rooms() {
     };
 
     return (
-        <div className="space-y-6 fade-in">
+        <div className="space-y-6 fade-in overflow-x-hidden">
+            <ScrollReveal direction="down" delay={0.1}>
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-white flex items-center gap-2"><MapPin className="text-ocean-400" /> Manage Rooms</h1>
@@ -61,6 +63,7 @@ export default function Rooms() {
                     <Plus className="w-4 h-4" /> Add Room
                 </button>
             </div>
+            </ScrollReveal>
 
             {isLoading ? (
                 <div className="flex justify-center py-12"><div className="ocean-spinner"></div></div>
@@ -71,8 +74,9 @@ export default function Rooms() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {rooms.map(room => (
-                        <div key={room._id} className="glass-card rounded-2xl p-5 group">
+                    {rooms.map((room, index) => (
+                        <ScrollReveal key={room._id} direction="up" delay={0.1 * (index % 10)}>
+                        <div className="glass-card rounded-2xl p-5 group h-full">
                             <div className="flex justify-between items-start mb-3">
                                 <div>
                                     <h3 className="font-bold text-white text-lg">Room {room.number}</h3>
@@ -93,6 +97,7 @@ export default function Rooms() {
                                 </div>
                             )}
                         </div>
+                        </ScrollReveal>
                     ))}
                 </div>
             )}

@@ -3,6 +3,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { BookOpen, Clock, Calendar, User, ArrowRight } from 'lucide-react';
+import ScrollReveal from '../components/ScrollReveal';
 
 export default function FacultyDashboard() {
     const { user } = useAuthStore();
@@ -32,31 +33,37 @@ export default function FacultyDashboard() {
     const totalWeeklyHours = schedules.length;
 
     return (
-        <div className="space-y-6 fade-in">
-            <div>
-                <h1 className="text-2xl font-bold text-white">Welcome, {user?.name} 🌊</h1>
-                <p className="text-ocean-200/50 text-sm mt-1">Here's your teaching schedule at a glance.</p>
-            </div>
+        <div className="space-y-6 fade-in overflow-x-hidden">
+            <ScrollReveal direction="down">
+                <div>
+                    <h1 className="text-2xl font-bold text-white">Welcome, {user?.name} 🌊</h1>
+                    <p className="text-ocean-200/50 text-sm mt-1">Here's your teaching schedule at a glance.</p>
+                </div>
+            </ScrollReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* ... existing map ... */}
                 {[
                     { label: 'My Courses', value: myCourses.length, icon: BookOpen, gradient: 'from-ocean-400 to-blue-500' },
                     { label: 'Weekly Hours', value: totalWeeklyHours, icon: Clock, gradient: 'from-purple-400 to-indigo-500' },
                     { label: "Today's Classes", value: todayClasses.length, icon: Calendar, gradient: 'from-emerald-400 to-teal-500' },
                 ].map((s, i) => (
-                    <div key={i} className="glass-card stat-card-3d rounded-2xl p-5 flex items-center gap-4">
-                        <div className={`bg-gradient-to-br ${s.gradient} p-3.5 rounded-xl text-white icon-3d`}>
-                            <s.icon className="h-5 w-5" />
+                    <ScrollReveal key={i} direction="up" delay={i * 0.1}>
+                        <div className="glass-card stat-card-3d rounded-2xl p-5 flex items-center gap-4">
+                            <div className={`bg-gradient-to-br ${s.gradient} p-3.5 rounded-xl text-white icon-3d`}>
+                                <s.icon className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-ocean-200/50">{s.label}</p>
+                                <p className="text-2xl font-bold text-white">{isLoading ? '...' : s.value}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-xs font-medium text-ocean-200/50">{s.label}</p>
-                            <p className="text-2xl font-bold text-white">{isLoading ? '...' : s.value}</p>
-                        </div>
-                    </div>
+                    </ScrollReveal>
                 ))}
             </div>
 
             {/* Assigned Courses */}
+            <ScrollReveal direction="left" delay={0.2}>
             <div className="glass-card rounded-2xl p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-base font-bold text-white flex items-center gap-2">
@@ -91,8 +98,10 @@ export default function FacultyDashboard() {
                     </div>
                 )}
             </div>
+            </ScrollReveal>
 
             {/* Today's Schedule */}
+            <ScrollReveal direction="right" delay={0.3}>
             <div className="glass-card rounded-2xl p-6">
                 <h3 className="text-base font-bold text-white mb-4">Today's Schedule — {DAYS[today]}</h3>
                 {isLoading ? (
@@ -125,8 +134,10 @@ export default function FacultyDashboard() {
                     </div>
                 )}
             </div>
+            </ScrollReveal>
 
             {/* All My Classes */}
+            <ScrollReveal direction="up" delay={0.4}>
             <div className="glass-card rounded-2xl p-6">
                 <h3 className="text-base font-bold text-white mb-4">All My Classes</h3>
                 {schedules.length === 0 ? (
@@ -161,6 +172,7 @@ export default function FacultyDashboard() {
                     </div>
                 )}
             </div>
+            </ScrollReveal>
         </div>
     );
 }

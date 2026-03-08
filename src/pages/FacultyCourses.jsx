@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { BookOpen, Clock, User, MapPin } from 'lucide-react';
+import ScrollReveal from '../components/ScrollReveal';
 
 export default function FacultyCourses() {
     const [courses, setCourses] = useState([]);
@@ -17,13 +18,15 @@ export default function FacultyCourses() {
     }, []);
 
     return (
-        <div className="space-y-6 fade-in">
+        <div className="space-y-6 fade-in overflow-x-hidden">
+            <ScrollReveal direction="down" delay={0.1}>
             <div>
                 <h1 className="text-2xl font-bold text-white flex items-center gap-2">
                     <BookOpen className="text-ocean-400" /> My Courses
                 </h1>
                 <p className="text-ocean-200/50 text-sm mt-1">Courses assigned to you by the admin.</p>
             </div>
+            </ScrollReveal>
 
             {isLoading ? (
                 <div className="flex justify-center py-12"><div className="ocean-spinner"></div></div>
@@ -36,8 +39,8 @@ export default function FacultyCourses() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {courses.map((course, i) => (
-                        <div key={course._id} className="glass-card rounded-2xl p-6 group hover:border-ocean-500/20 transition-all duration-300"
-                            style={{ animationDelay: `${i * 0.08}s` }}>
+                        <ScrollReveal key={course._id} direction="up" delay={0.1 * (i % 6)}>
+                        <div className="glass-card rounded-2xl p-6 group hover:border-ocean-500/20 transition-all duration-300 h-full">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="p-3 rounded-xl bg-gradient-to-br from-ocean-400 to-blue-500 text-white shadow-lg shadow-ocean-500/15">
                                     <BookOpen className="w-5 h-5" />
@@ -58,6 +61,7 @@ export default function FacultyCourses() {
                                 </div>
                             </div>
                         </div>
+                        </ScrollReveal>
                     ))}
                 </div>
             )}

@@ -2,13 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { Users, BookOpen, Clock, CalendarCheck2, X, BarChart3, ArrowRight } from 'lucide-react';
-import {
-    Chart as ChartJS,
-    CategoryScale, LinearScale, PointElement, LineElement, BarElement,
-    Title, Tooltip, Legend, Filler
-} from 'chart.js';
+import { BookOpen, Users, CalendarCheck2, BarChart3, Plus, ArrowRight, X } from 'lucide-react';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
+import ScrollReveal from '../components/ScrollReveal';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler);
 
@@ -99,38 +96,47 @@ export default function AdminDashboard() {
     };
 
     return (
-        <div className="space-y-6 fade-in">
-            <div>
-                <h1 className="text-2xl font-bold text-white">Welcome, {user?.name} 🌊</h1>
-                <p className="text-ocean-200/50 text-sm mt-1">Here's what's flowing in your institution today.</p>
-            </div>
+        <div className="space-y-6 fade-in overflow-x-hidden">
+            <ScrollReveal direction="down">
+                <div>
+                    <h1 className="text-2xl font-bold text-white">Welcome, {user?.name} 🌊</h1>
+                    <p className="text-ocean-200/50 text-sm mt-1">Here's what's flowing in your institution today.</p>
+                </div>
+            </ScrollReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((s, i) => (
-                    <div key={i} className="glass-card stat-card-3d rounded-2xl p-5 flex items-center gap-4" style={{ animationDelay: `${i * 0.1}s` }}>
-                        <div className={`bg-gradient-to-br ${s.gradient} p-3.5 rounded-xl text-white icon-3d`}>
-                            <s.icon className="h-5 w-5" />
+                    <ScrollReveal key={i} direction="up" delay={i * 0.1}>
+                        <div className="glass-card stat-card-3d rounded-2xl p-5 flex items-center gap-4">
+                            <div className={`bg-gradient-to-br ${s.gradient} p-3.5 rounded-xl text-white icon-3d`}>
+                                <s.icon className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-ocean-200/50">{s.label}</p>
+                                <p className="text-2xl font-bold text-white">{isLoading ? '...' : s.value}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-xs font-medium text-ocean-200/50">{s.label}</p>
-                            <p className="text-2xl font-bold text-white">{isLoading ? '...' : s.value}</p>
-                        </div>
-                    </div>
+                    </ScrollReveal>
                 ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="glass-card rounded-2xl p-6">
-                    <h3 className="text-base font-bold text-white mb-4">Classroom Utilization</h3>
-                    <div className="h-56"><Bar options={chartOpts} data={utilizationData} /></div>
-                </div>
-                <div className="glass-card rounded-2xl p-6">
-                    <h3 className="text-base font-bold text-white mb-4">Department Workload</h3>
-                    <div className="h-56"><Line options={chartOpts} data={workloadData} /></div>
-                </div>
+                <ScrollReveal direction="left" delay={0.2}>
+                    <div className="glass-card rounded-2xl p-6">
+                        <h3 className="text-base font-bold text-white mb-4">Classroom Utilization</h3>
+                        <div className="h-56"><Bar options={chartOpts} data={utilizationData} /></div>
+                    </div>
+                </ScrollReveal>
+                <ScrollReveal direction="right" delay={0.3}>
+                    <div className="glass-card rounded-2xl p-6">
+                        <h3 className="text-base font-bold text-white mb-4">Department Workload</h3>
+                        <div className="h-56"><Line options={chartOpts} data={workloadData} /></div>
+                    </div>
+                </ScrollReveal>
             </div>
 
-            <div className="glass-card rounded-2xl p-6">
+            <ScrollReveal direction="up" delay={0.4}>
+                <div className="glass-card rounded-2xl p-6">
                 <h3 className="text-base font-bold text-white mb-4">Quick Actions</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {[
@@ -149,6 +155,7 @@ export default function AdminDashboard() {
                     ))}
                 </div>
             </div>
+            </ScrollReveal>
 
             {showModal && (
                 <div className="modal-overlay">

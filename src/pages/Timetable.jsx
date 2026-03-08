@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuthStore } from '../store/useAuthStore';
-import { Calendar as CalendarIcon, Clock, MapPin, User as UserIcon, X, Trash2, AlertTriangle, UserPlus, Coffee } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, MapPin, User as UserIcon, X, Trash2, AlertTriangle, UserPlus, Coffee, BookOpen, Filter } from 'lucide-react';
+import ScrollReveal from '../components/ScrollReveal';
 
 export default function Timetable() {
     const { user } = useAuthStore();
@@ -159,9 +160,10 @@ export default function Timetable() {
     if (isLoading) return <div className="flex justify-center items-center h-64"><div className="ocean-spinner"></div></div>;
 
     return (
-        <div className="space-y-6 fade-in">
-            <div className="flex justify-between items-center">
-                <div>
+        <div className="space-y-6 fade-in overflow-x-hidden">
+            <ScrollReveal direction="right" delay={0.1}>
+                <div className="flex justify-between items-center">
+                    <div>
                     <h1 className="text-2xl font-bold text-white flex items-center gap-2">
                         <CalendarIcon className="text-ocean-400" /> Weekly Timetable
                     </h1>
@@ -177,10 +179,12 @@ export default function Timetable() {
                         <button onClick={openGenModal} className="btn-ocean px-4 py-2 text-sm">+ Generate Schedule</button>
                     </div>
                 )}
-            </div>
+                </div>
+            </ScrollReveal>
 
-            <div className="glass-card rounded-2xl overflow-hidden">
-                <div className="overflow-x-auto">
+            <ScrollReveal direction="left" delay={0.2}>
+                <div className="glass-card rounded-2xl overflow-hidden">
+                    <div className="overflow-x-auto">
                     <table className="w-full border-collapse min-w-[900px]">
                         <thead>
                             <tr>
@@ -259,6 +263,7 @@ export default function Timetable() {
                     </table>
                 </div>
             </div>
+            </ScrollReveal>
 
             {/* Generate Modal */}
             {isGenOpen && (

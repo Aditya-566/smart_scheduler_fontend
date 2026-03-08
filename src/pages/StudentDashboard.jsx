@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import api from '../services/api';
 import { Calendar, Clock, BookOpen, MapPin } from 'lucide-react';
+import ScrollReveal from '../components/ScrollReveal';
 
 export default function StudentDashboard() {
     const { user } = useAuthStore();
@@ -30,15 +31,18 @@ export default function StudentDashboard() {
     const nextClass = todayClasses.find(s => s.timeSlot?.startTime > currentTime);
 
     return (
-        <div className="space-y-6 fade-in">
-            <div>
-                <h1 className="text-2xl font-bold text-white">Hey, {user?.name}! 🌊</h1>
-                <p className="text-ocean-200/50 text-sm mt-1">{DAYS[today]}'s schedule is ready for you.</p>
-            </div>
+        <div className="space-y-6 fade-in overflow-x-hidden">
+            <ScrollReveal direction="down">
+                <div>
+                    <h1 className="text-2xl font-bold text-white">Hey, {user?.name}! 🌊</h1>
+                    <p className="text-ocean-200/50 text-sm mt-1">{DAYS[today]}'s schedule is ready for you.</p>
+                </div>
+            </ScrollReveal>
 
             {/* Next Class Highlight */}
             {nextClass && (
-                <div className="glass-card rounded-2xl p-6 glow-animation border-ocean-400/20">
+                <ScrollReveal direction="left" delay={0.1}>
+                    <div className="glass-card rounded-2xl p-6 glow-animation border-ocean-400/20">
                     <div className="flex items-center gap-2 mb-3">
                         <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
                         <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Next Up</p>
@@ -49,10 +53,12 @@ export default function StudentDashboard() {
                         <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-ocean-400" />Room {nextClass.room?.number}</span>
                         <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-ocean-400" />{nextClass.course?.code}</span>
                     </div>
-                </div>
+                    </div>
+                </ScrollReveal>
             )}
 
             {/* Today's Classes */}
+            <ScrollReveal direction="right" delay={0.2}>
             <div className="glass-card rounded-2xl p-6">
                 <h3 className="text-base font-bold text-white mb-4 flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-ocean-400" />
@@ -91,6 +97,7 @@ export default function StudentDashboard() {
                     </div>
                 )}
             </div>
+            </ScrollReveal>
         </div>
     );
 }

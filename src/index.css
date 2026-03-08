@@ -159,30 +159,25 @@ body {
     inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
-/* 3D Sidebar */
+/* 3D Sidebar — blends seamlessly with ocean background */
 .glass-sidebar {
-  background: linear-gradient(180deg, rgba(7, 21, 41, 0.95), rgba(4, 13, 26, 0.98));
-  backdrop-filter: blur(24px);
-  border-right: 1px solid rgba(0, 178, 203, 0.1);
-  box-shadow:
-    4px 0 30px rgba(0, 0, 0, 0.4),
-    1px 0 0 rgba(0, 178, 203, 0.08),
-    inset -1px 0 20px rgba(0, 0, 0, 0.2),
-    inset 1px 0 0 rgba(0, 178, 203, 0.05);
-  transform: translateZ(10px);
+  background: linear-gradient(135deg, rgba(0, 178, 203, 0.05) 0%, rgba(2, 8, 16, 0.1) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-right: 1px solid rgba(0, 178, 203, 0.08);
+  box-shadow: 4px 0 40px rgba(0, 0, 0, 0.1);
+  transform: translateZ(5px);
   transform-style: preserve-3d;
 }
 
-/* 3D Topbar */
+/* 3D Topbar — blends with ocean */
 .glass-topbar {
-  background: linear-gradient(90deg, rgba(7, 21, 41, 0.9), rgba(10, 31, 61, 0.85));
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 178, 203, 0.08);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.3),
-    0 1px 0 rgba(0, 178, 203, 0.06),
-    inset 0 -1px 10px rgba(0, 0, 0, 0.15);
-  transform: translateZ(5px);
+  background: linear-gradient(90deg, rgba(0, 178, 203, 0.03) 0%, rgba(2, 8, 16, 0.1) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0, 178, 203, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  transform: translateZ(2px);
 }
 
 .glass-light {
@@ -252,24 +247,30 @@ body {
 
 /* ============= BUTTONS ============= */
 .btn-ocean {
-  background: linear-gradient(145deg, #00c4e0, #0081a3, #006d8a);
+  background: linear-gradient(145deg, rgba(0, 196, 224, 0.8), rgba(0, 129, 163, 0.8), rgba(0, 109, 138, 0.8));
+  backdrop-filter: blur(10px);
   color: white;
   font-weight: 600;
-  border: none;
-  border-radius: 12px;
-  padding: 0.75rem 1.5rem;
+  border: 1px solid rgba(0, 220, 255, 0.3);
+  /* Liquid border-radius */
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  padding: 0.75rem 1.75rem;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   box-shadow:
     0 6px 20px rgba(0, 178, 203, 0.25),
-    0 2px 6px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
-  animation: floatBob 7s ease-in-out infinite;
+    inset 0 4px 10px rgba(255, 255, 255, 0.3),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.2);
+  animation: floatBob 6s ease-in-out infinite, liquidShape 8s ease-in-out infinite alternate;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   transform-style: preserve-3d;
+}
+
+@keyframes liquidShape {
+  0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+  100% { border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%; }
 }
 
 /* Water ripple on click */
@@ -309,14 +310,14 @@ body {
 }
 
 .btn-ocean:hover {
-  transform: translateY(-4px) translateZ(12px) scale(1.03);
+  transform: translateY(-4px) translateZ(12px) scale(1.05);
   box-shadow:
     0 15px 40px rgba(0, 178, 203, 0.35),
-    0 5px 15px rgba(0, 0, 0, 0.3),
-    0 0 60px rgba(0, 178, 203, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.15);
-  background: linear-gradient(145deg, #00daf5, #00a8c2, #0090b8);
+    0 0 60px rgba(0, 178, 203, 0.2),
+    inset 0 4px 15px rgba(255, 255, 255, 0.4),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(145deg, rgba(0, 218, 245, 0.9), rgba(0, 168, 194, 0.9));
+  border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; /* Become more regular on hover */
 }
 
 .btn-ocean:active {
