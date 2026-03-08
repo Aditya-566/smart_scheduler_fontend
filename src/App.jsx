@@ -9,6 +9,7 @@ import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Timetable from './pages/Timetable';
 import Courses from './pages/Courses';
+import FacultyCourses from './pages/FacultyCourses';
 import Rooms from './pages/Rooms';
 import Settings from './pages/Settings';
 
@@ -59,6 +60,16 @@ function App() {
             <ProtectedRoute>
               <DashboardLayout>
                 <Timetable />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-courses"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <FacultyCourses />
               </DashboardLayout>
             </ProtectedRoute>
           }

@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { BookOpen, Clock, Calendar, User } from 'lucide-react';
+import { BookOpen, Clock, Calendar, User, ArrowRight } from 'lucide-react';
 
 export default function FacultyDashboard() {
     const { user } = useAuthStore();
+    const navigate = useNavigate();
     const [schedules, setSchedules] = useState([]);
+    const [myCourses, setMyCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -14,8 +17,12 @@ export default function FacultyDashboard() {
     useEffect(() => {
         (async () => {
             try {
-                const { data } = await api.get('/schedules');
-                setSchedules(data);
+                const [schedRes, courseRes] = await Promise.all([
+                    api.get('/schedules'),
+                    api.get('/courses/faculty/my-courses')
+                ]);
+                setSchedules(schedRes.data);
+                setMyCourses(courseRes.data);
             } catch (e) { console.error(e); }
             finally { setIsLoading(false); }
         })();
@@ -23,7 +30,6 @@ export default function FacultyDashboard() {
 
     const todayClasses = schedules.filter(s => s.timeSlot?.dayOfWeek === today);
     const totalWeeklyHours = schedules.length;
-    const uniqueCourses = [...new Set(schedules.map(s => s.course?._id))].length;
 
     return (
         <div className="space-y-6 fade-in">
@@ -34,7 +40,7 @@ export default function FacultyDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                    { label: 'My Courses', value: uniqueCourses, icon: BookOpen, gradient: 'from-ocean-400 to-blue-500' },
+                    { label: 'My Courses', value: myCourses.length, icon: BookOpen, gradient: 'from-ocean-400 to-blue-500' },
                     { label: 'Weekly Hours', value: totalWeeklyHours, icon: Clock, gradient: 'from-purple-400 to-indigo-500' },
                     { label: "Today's Classes", value: todayClasses.length, icon: Calendar, gradient: 'from-emerald-400 to-teal-500' },
                 ].map((s, i) => (
@@ -50,6 +56,43 @@ export default function FacultyDashboard() {
                 ))}
             </div>
 
+            {/* Assigned Courses */}
+            <div className="glass-card rounded-2xl p-6">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-base font-bold text-white flex items-center gap-2">
+                        <BookOpen className="w-5 h-5 text-ocean-400" /> My Assigned Courses
+                    </h3>
+                    {myCourses.length > 0 && (
+                        <button onClick={() => navigate('/my-courses')}
+                            className="text-xs text-ocean-300/60 hover:text-ocean-300 flex items-center gap-1 transition-colors">
+                            View All <ArrowRight className="w-3 h-3" />
+                        </button>
+                    )}
+                </div>
+                {isLoading ? (
+                    <div className="flex justify-center py-6"><div className="ocean-spinner"></div></div>
+                ) : myCourses.length === 0 ? (
+                    <div className="text-center py-6 text-ocean-200/40">
+                        <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                        <p className="text-sm">No courses assigned yet. Contact your admin.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {myCourses.slice(0, 6).map(c => (
+                            <div key={c._id} className="glass-light rounded-xl p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-ocean-500/10 text-ocean-300 border border-ocean-500/15">{c.code}</span>
+                                    <span className="text-xs text-ocean-200/30">{c.credits} cr</span>
+                                </div>
+                                <p className="font-semibold text-white text-sm leading-tight">{c.name}</p>
+                                <p className="text-xs text-ocean-200/30 mt-1">{c.department?.name}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Today's Schedule */}
             <div className="glass-card rounded-2xl p-6">
                 <h3 className="text-base font-bold text-white mb-4">Today's Schedule — {DAYS[today]}</h3>
                 {isLoading ? (
@@ -83,6 +126,7 @@ export default function FacultyDashboard() {
                 )}
             </div>
 
+            {/* All My Classes */}
             <div className="glass-card rounded-2xl p-6">
                 <h3 className="text-base font-bold text-white mb-4">All My Classes</h3>
                 {schedules.length === 0 ? (
@@ -102,16 +146,16 @@ export default function FacultyDashboard() {
                                 {schedules
                                     .sort((a, b) => (a.timeSlot?.dayOfWeek || 0) - (b.timeSlot?.dayOfWeek || 0) || (a.timeSlot?.startTime || '').localeCompare(b.timeSlot?.startTime || ''))
                                     .map(s => (
-                                        <tr key={s._id}>
-                                            <td className="font-medium text-ocean-200">{DAYS[s.timeSlot?.dayOfWeek] || 'N/A'}</td>
-                                            <td>{s.timeSlot?.startTime} - {s.timeSlot?.endTime}</td>
-                                            <td>
-                                                <span className="font-medium text-white">{s.course?.name}</span>
-                                                <span className="text-ocean-400/60 ml-2 text-xs">({s.course?.code})</span>
-                                            </td>
-                                            <td>Room {s.room?.number}</td>
-                                        </tr>
-                                    ))}
+                                    <tr key={s._id}>
+                                        <td className="font-medium text-ocean-200">{DAYS[s.timeSlot?.dayOfWeek] || 'N/A'}</td>
+                                        <td>{s.timeSlot?.startTime} - {s.timeSlot?.endTime}</td>
+                                        <td>
+                                            <span className="font-medium text-white">{s.course?.name}</span>
+                                            <span className="text-ocean-400/60 ml-2 text-xs">({s.course?.code})</span>
+                                        </td>
+                                        <td>Room {s.room?.number}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>

@@ -28,6 +28,7 @@ export default function DashboardLayout({ children }) {
     const navItems = [
         { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', roles: ['ADMIN', 'FACULTY', 'STUDENT'] },
         { label: 'Timetable', icon: Calendar, path: '/timetable', roles: ['ADMIN', 'FACULTY', 'STUDENT'] },
+        { label: 'My Courses', icon: BookOpen, path: '/my-courses', roles: ['FACULTY'] },
         { label: 'Users', icon: Users, path: '/users', roles: ['ADMIN'] },
         { label: 'Courses', icon: BookOpen, path: '/courses', roles: ['ADMIN'] },
         { label: 'Rooms', icon: MapPin, path: '/rooms', roles: ['ADMIN'] },
