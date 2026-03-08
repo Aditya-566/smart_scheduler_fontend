@@ -73,6 +73,7 @@ export default function DashboardLayout({ children }) {
                             smooth={true}
                             offset={-80}
                             duration={600}
+                            containerId="main-scroll-container"
                             activeClass="bg-gradient-to-r from-ocean-500/20 to-ocean-600/10 text-ocean-300 border border-ocean-500/20 !opacity-100"
                             onClick={() => setMobileMenuOpen(false)}
                             className="nav-item-3d flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group text-ocean-200/50 hover:text-ocean-200 hover:bg-ocean-500/5 cursor-pointer border border-transparent"
@@ -133,7 +134,7 @@ export default function DashboardLayout({ children }) {
                 </header>
 
                 {/* Content area */}
-                <div className="flex-1 overflow-auto p-6 md:p-8">
+                <div id="main-scroll-container" className="flex-1 overflow-auto p-6 md:p-8">
                     {children}
                 </div>
             </main>

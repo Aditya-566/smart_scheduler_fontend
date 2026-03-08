@@ -142,8 +142,8 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {[
                         { label: 'Generate Schedule', action: openModal, color: 'ocean' },
-                        { label: 'Add New Course', action: () => scroller.scrollTo('courses', { smooth: true, offset: -80, duration: 600 }), color: 'purple' },
-                        { label: 'Manage Classrooms', action: () => scroller.scrollTo('rooms', { smooth: true, offset: -80, duration: 600 }), color: 'emerald' }
+                        { label: 'Add New Course', action: () => scroller.scrollTo('courses', { smooth: true, offset: -80, duration: 600, containerId: 'main-scroll-container' }), color: 'purple' },
+                        { label: 'Manage Classrooms', action: () => scroller.scrollTo('rooms', { smooth: true, offset: -80, duration: 600, containerId: 'main-scroll-container' }), color: 'emerald' }
                     ].map((btn, i) => (
                         <button key={i} onClick={btn.action}
                             className={`py-4 px-5 rounded-xl font-medium text-left flex justify-between items-center group
@@ -171,7 +171,7 @@ export default function AdminDashboard() {
                                     <h4 className="font-bold mb-1">Success! 🎉</h4>
                                     <p className="text-sm">{result.message}</p>
                                     <p className="text-xs mt-2 opacity-70">Generated {result.count} slots.</p>
-                                    <button onClick={() => { setShowModal(false); scroller.scrollTo('timetable', { smooth: true, offset: -80, duration: 600 }); }}
+                                    <button onClick={() => { setShowModal(false); scroller.scrollTo('timetable', { smooth: true, offset: -80, duration: 600, containerId: 'main-scroll-container' }); }}
                                         className="btn-ocean w-full mt-4 py-2 text-sm">View Timetable</button>
                                 </div>
                             ) : (
