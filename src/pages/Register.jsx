@@ -95,7 +95,6 @@ export default function Register() {
                             className="select-ocean">
                             <option value="STUDENT">Student</option>
                             <option value="FACULTY">Faculty</option>
-                            <option value="ADMIN">Admin</option>
                         </select>
                     </div>
 
