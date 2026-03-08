@@ -44,14 +44,14 @@ export default function DashboardLayout({ children }) {
             {/* Sidebar */}
             <aside className={`
                 fixed md:sticky top-0 left-0 z-40 w-72 h-screen flex flex-col
-                glass border-r border-ocean-500/10
+                glass-sidebar
                 transition-transform duration-300 ease-in-out
                 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Logo */}
                 <div className="h-18 flex items-center px-6 border-b border-ocean-500/10">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center shadow-lg shadow-ocean-500/20">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center icon-3d">
                             <Waves className="w-5 h-5 text-white" />
                         </div>
                         <div>
@@ -71,8 +71,8 @@ export default function DashboardLayout({ children }) {
                             to={item.path}
                             onClick={() => setMobileMenuOpen(false)}
                             className={({ isActive }) =>
-                                `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${isActive
-                                    ? 'bg-gradient-to-r from-ocean-500/20 to-ocean-600/10 text-ocean-300 border border-ocean-500/20 shadow-lg shadow-ocean-500/5'
+                                `nav-item-3d flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${isActive
+                                    ? 'active bg-gradient-to-r from-ocean-500/20 to-ocean-600/10 text-ocean-300 border border-ocean-500/20'
                                     : 'text-ocean-200/50 hover:text-ocean-200 hover:bg-ocean-500/5'
                                 }`
                             }
@@ -86,7 +86,7 @@ export default function DashboardLayout({ children }) {
                 {/* User section */}
                 <div className="p-4 border-t border-ocean-500/10">
                     <div className="flex items-center gap-3 px-3 py-2 mb-3">
-                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-ocean-500/20">
+                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center text-white font-bold text-sm icon-3d">
                             {user?.name?.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -112,7 +112,7 @@ export default function DashboardLayout({ children }) {
             {/* Main Content */}
             <main className="flex-1 flex flex-col min-w-0 relative z-10">
                 {/* Topbar */}
-                <header className="h-16 glass border-b border-ocean-500/10 flex items-center justify-between px-6 sticky top-0 z-20">
+                <header className="h-16 glass-topbar flex items-center justify-between px-6 sticky top-0 z-20">
                     <div className="flex items-center gap-4">
                         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-ocean-300 hover:text-ocean-200">
                             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -126,7 +126,7 @@ export default function DashboardLayout({ children }) {
                             <p className="text-sm font-bold text-white">{user?.name}</p>
                             <p className="text-xs text-ocean-300/40">{user?.email}</p>
                         </div>
-                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-ocean-500/20">
+                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center text-white font-bold text-sm icon-3d">
                             {user?.name?.charAt(0).toUpperCase()}
                         </div>
                     </div>

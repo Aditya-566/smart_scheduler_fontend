@@ -33,6 +33,13 @@ body {
   color: #e6f7fa;
   min-height: 100vh;
   overflow-x: hidden;
+  perspective: 1200px;
+}
+
+/* 3D scene container */
+.scene-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
 }
 
 /* ============= ANIMATIONS ============= */
@@ -145,7 +152,37 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(0, 178, 203, 0.15);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 1px rgba(0, 178, 203, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* 3D Sidebar */
+.glass-sidebar {
+  background: linear-gradient(180deg, rgba(7, 21, 41, 0.95), rgba(4, 13, 26, 0.98));
+  backdrop-filter: blur(24px);
+  border-right: 1px solid rgba(0, 178, 203, 0.1);
+  box-shadow:
+    4px 0 30px rgba(0, 0, 0, 0.4),
+    1px 0 0 rgba(0, 178, 203, 0.08),
+    inset -1px 0 20px rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(0, 178, 203, 0.05);
+  transform: translateZ(10px);
+  transform-style: preserve-3d;
+}
+
+/* 3D Topbar */
+.glass-topbar {
+  background: linear-gradient(90deg, rgba(7, 21, 41, 0.9), rgba(10, 31, 61, 0.85));
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 178, 203, 0.08);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(0, 178, 203, 0.06),
+    inset 0 -1px 10px rgba(0, 0, 0, 0.15);
+  transform: translateZ(5px);
 }
 
 .glass-light {
@@ -154,25 +191,36 @@ body {
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 178, 203, 0.12);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(0, 178, 203, 0.06);
 }
 
 .glass-light:hover {
   background: rgba(0, 178, 203, 0.12);
   border-color: rgba(0, 178, 203, 0.25);
-  box-shadow: 0 4px 20px rgba(0, 178, 203, 0.1), inset 0 1px 0 rgba(0, 220, 255, 0.05);
-  transform: translateY(-1px);
+  box-shadow:
+    0 8px 25px rgba(0, 178, 203, 0.12),
+    0 4px 15px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(0, 220, 255, 0.08);
+  transform: translateY(-2px) translateZ(8px);
 }
 
 .glass-card {
-  background: linear-gradient(135deg, rgba(10, 31, 61, 0.7), rgba(15, 42, 82, 0.5));
+  background: linear-gradient(145deg, rgba(12, 35, 68, 0.75), rgba(8, 24, 48, 0.6));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(0, 178, 203, 0.12);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(0, 178, 203, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   animation: floatBob 8s ease-in-out infinite;
   position: relative;
   overflow: hidden;
+  transform-style: preserve-3d;
 }
 
 .glass-card::before {
@@ -193,13 +241,18 @@ body {
 
 .glass-card:hover {
   border-color: rgba(0, 178, 203, 0.35);
-  box-shadow: 0 12px 40px rgba(0, 178, 203, 0.15), 0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(0, 220, 255, 0.08);
-  transform: translateY(-4px);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.35),
+    0 12px 30px rgba(0, 178, 203, 0.12),
+    0 0 1px rgba(0, 220, 255, 0.3),
+    inset 0 1px 0 rgba(0, 220, 255, 0.1),
+    inset 0 -2px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px) translateZ(15px);
 }
 
 /* ============= BUTTONS ============= */
 .btn-ocean {
-  background: linear-gradient(135deg, #00b2cb, #0081a3);
+  background: linear-gradient(145deg, #00c4e0, #0081a3, #006d8a);
   color: white;
   font-weight: 600;
   border: none;
@@ -209,8 +262,14 @@ body {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 178, 203, 0.3);
+  box-shadow:
+    0 6px 20px rgba(0, 178, 203, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
   animation: floatBob 7s ease-in-out infinite;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transform-style: preserve-3d;
 }
 
 /* Water ripple on click */
@@ -240,7 +299,7 @@ body {
   left: -100%;
   width: 60%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   pointer-events: none;
   transition: none;
 }
@@ -250,14 +309,21 @@ body {
 }
 
 .btn-ocean:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 30px rgba(0, 178, 203, 0.5), 0 0 40px rgba(0, 178, 203, 0.15);
-  background: linear-gradient(135deg, #00c4e0, #0090b8);
+  transform: translateY(-4px) translateZ(12px) scale(1.03);
+  box-shadow:
+    0 15px 40px rgba(0, 178, 203, 0.35),
+    0 5px 15px rgba(0, 0, 0, 0.3),
+    0 0 60px rgba(0, 178, 203, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(145deg, #00daf5, #00a8c2, #0090b8);
 }
 
 .btn-ocean:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 0 2px 10px rgba(0, 178, 203, 0.4);
+  transform: translateY(1px) translateZ(0) scale(0.97);
+  box-shadow:
+    0 2px 8px rgba(0, 178, 203, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .btn-ocean:disabled {
@@ -303,7 +369,7 @@ body {
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  background: linear-gradient(145deg, #f87171, #ef4444, #b91c1c);
   color: white;
   font-weight: 600;
   border: none;
@@ -311,18 +377,27 @@ body {
   padding: 0.75rem 1.5rem;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+  box-shadow:
+    0 6px 20px rgba(239, 68, 68, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .btn-danger:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+  transform: translateY(-4px) translateZ(10px) scale(1.03);
+  box-shadow:
+    0 15px 35px rgba(239, 68, 68, 0.3),
+    0 5px 15px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .btn-danger:active {
-  transform: translateY(0) scale(0.98);
+  transform: translateY(1px) translateZ(0) scale(0.97);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* ============= INPUTS ============= */
@@ -338,6 +413,9 @@ body {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   position: relative;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.2),
+    0 1px 0 rgba(0, 178, 203, 0.06);
 }
 
 .input-ocean::placeholder {
@@ -348,7 +426,10 @@ body {
 .input-ocean:hover {
   border-color: rgba(0, 178, 203, 0.4);
   background: rgba(0, 178, 203, 0.08);
-  box-shadow: 0 0 20px rgba(0, 178, 203, 0.05);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(0, 178, 203, 0.06),
+    0 2px 8px rgba(0, 178, 203, 0.04);
 }
 
 .input-ocean:hover::placeholder {
@@ -357,9 +438,15 @@ body {
 
 .input-ocean:focus {
   border-color: #00b2cb;
-  box-shadow: 0 0 0 3px rgba(0, 178, 203, 0.15), 0 0 30px rgba(0, 178, 203, 0.1), inset 0 0 10px rgba(0, 178, 203, 0.03);
+  box-shadow:
+    0 0 0 3px rgba(0, 178, 203, 0.12),
+    0 0 30px rgba(0, 178, 203, 0.08),
+    0 4px 15px rgba(0, 0, 0, 0.2),
+    inset 0 2px 8px rgba(0, 0, 0, 0.15),
+    inset 0 0 10px rgba(0, 178, 203, 0.03);
   background: rgba(0, 178, 203, 0.1);
   animation: borderFlow 3s ease infinite;
+  transform: translateY(-1px);
 }
 
 .select-ocean {
@@ -374,6 +461,7 @@ body {
   outline: none;
   appearance: none;
   cursor: pointer;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2), 0 1px 0 rgba(0, 178, 203, 0.06);
 }
 
 .select-ocean option {
@@ -384,13 +472,19 @@ body {
 .select-ocean:hover {
   border-color: rgba(0, 178, 203, 0.4);
   background: rgba(0, 178, 203, 0.08);
-  box-shadow: 0 0 15px rgba(0, 178, 203, 0.05);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.2),
+    0 0 15px rgba(0, 178, 203, 0.06);
 }
 
 .select-ocean:focus {
   border-color: #00b2cb;
-  box-shadow: 0 0 0 3px rgba(0, 178, 203, 0.15), 0 0 25px rgba(0, 178, 203, 0.08);
+  box-shadow:
+    0 0 0 3px rgba(0, 178, 203, 0.12),
+    0 0 25px rgba(0, 178, 203, 0.08),
+    inset 0 2px 6px rgba(0, 0, 0, 0.15);
   animation: borderFlow 3s ease infinite;
+  transform: translateY(-1px);
 }
 
 /* ============= SCROLLBAR ============= */
@@ -466,12 +560,15 @@ body {
 }
 
 .ocean-table tbody tr {
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ocean-table tbody tr:hover {
-  background: rgba(0, 178, 203, 0.08);
-  box-shadow: inset 3px 0 0 rgba(0, 178, 203, 0.5);
+  background: linear-gradient(90deg, rgba(0, 178, 203, 0.1), rgba(0, 178, 203, 0.04));
+  box-shadow:
+    inset 3px 0 0 rgba(0, 178, 203, 0.5),
+    0 4px 15px rgba(0, 0, 0, 0.15);
+  transform: translateX(2px) translateZ(5px);
 }
 
 .ocean-table tbody tr:hover td {
@@ -492,12 +589,70 @@ body {
   to { transform: rotate(360deg); }
 }
 
+/* ============= NAV ITEMS 3D ============= */
+.nav-item-3d {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-item-3d:hover {
+  transform: translateX(4px) translateZ(8px);
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.2),
+    inset 0 0 15px rgba(0, 178, 203, 0.05);
+}
+
+.nav-item-3d.active {
+  box-shadow:
+    0 4px 20px rgba(0, 178, 203, 0.15),
+    inset 3px 0 0 rgba(0, 178, 203, 0.6),
+    inset 0 0 20px rgba(0, 178, 203, 0.05);
+  transform: translateX(2px);
+}
+
+/* ============= STAT CARD 3D ============= */
+.stat-card-3d {
+  transform-style: preserve-3d;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card-3d:hover {
+  transform: translateY(-6px) translateZ(20px) rotateX(2deg);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.3),
+    0 0 1px rgba(0, 220, 255, 0.3),
+    inset 0 1px 0 rgba(0, 220, 255, 0.1);
+}
+
+/* ============= 3D ICON CONTAINER ============= */
+.icon-3d {
+  transform-style: preserve-3d;
+  transition: all 0.4s ease;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.stat-card-3d:hover .icon-3d {
+  transform: translateZ(15px) scale(1.1);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(0, 178, 203, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
 /* ============= RESPONSIVE ============= */
 @media (max-width: 768px) {
   .glass-card {
-    animation: none; /* disable bob on mobile for performance */
+    animation: none;
   }
   .btn-ocean {
     animation: none;
+  }
+  body {
+    perspective: none;
   }
 }

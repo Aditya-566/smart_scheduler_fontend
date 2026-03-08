@@ -107,8 +107,8 @@ export default function AdminDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((s, i) => (
-                    <div key={i} className="glass-card rounded-2xl p-5 flex items-center gap-4" style={{ animationDelay: `${i * 0.1}s` }}>
-                        <div className={`bg-gradient-to-br ${s.gradient} p-3.5 rounded-xl text-white shadow-lg`}>
+                    <div key={i} className="glass-card stat-card-3d rounded-2xl p-5 flex items-center gap-4" style={{ animationDelay: `${i * 0.1}s` }}>
+                        <div className={`bg-gradient-to-br ${s.gradient} p-3.5 rounded-xl text-white icon-3d`}>
                             <s.icon className="h-5 w-5" />
                         </div>
                         <div>

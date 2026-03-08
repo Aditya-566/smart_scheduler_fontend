@@ -44,8 +44,8 @@ export default function FacultyDashboard() {
                     { label: 'Weekly Hours', value: totalWeeklyHours, icon: Clock, gradient: 'from-purple-400 to-indigo-500' },
                     { label: "Today's Classes", value: todayClasses.length, icon: Calendar, gradient: 'from-emerald-400 to-teal-500' },
                 ].map((s, i) => (
-                    <div key={i} className="glass-card rounded-2xl p-5 flex items-center gap-4">
-                        <div className={`bg-gradient-to-br ${s.gradient} p-3.5 rounded-xl text-white shadow-lg`}>
+                    <div key={i} className="glass-card stat-card-3d rounded-2xl p-5 flex items-center gap-4">
+                        <div className={`bg-gradient-to-br ${s.gradient} p-3.5 rounded-xl text-white icon-3d`}>
                             <s.icon className="h-5 w-5" />
                         </div>
                         <div>
