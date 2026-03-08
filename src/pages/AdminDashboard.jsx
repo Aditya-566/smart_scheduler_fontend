@@ -3,7 +3,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { BookOpen, Users, CalendarCheck2, BarChart3, Plus, ArrowRight, X } from 'lucide-react';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, Filler } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import ScrollReveal from '../components/ScrollReveal';
 
