@@ -3,12 +3,8 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { BookOpen, Users, CalendarCheck2, BarChart3, Plus, ArrowRight, X } from 'lucide-react';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, Filler } from 'chart.js';
-import { Bar, Line } from 'react-chartjs-2';
 import { scroller } from 'react-scroll';
 import ScrollReveal from '../components/ScrollReveal';
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler);
 
 export default function AdminDashboard() {
     const { user } = useAuthStore();
@@ -20,8 +16,6 @@ export default function AdminDashboard() {
         { label: 'Rooms Available', value: '0', icon: CalendarCheck2, gradient: 'from-emerald-400 to-teal-500' },
         { label: 'Scheduled Classes', value: '0', icon: BarChart3, gradient: 'from-amber-400 to-orange-500' },
     ]);
-    const [utilizationPercent, setUtilizationPercent] = useState([0, 0, 0, 0, 0]);
-    const [deptWorkload, setDeptWorkload] = useState({});
 
     // Generate Modal
     const [showModal, setShowModal] = useState(false);
@@ -53,48 +47,11 @@ export default function AdminDashboard() {
                     { label: 'Rooms Available', value: String(data.availableRooms || 0), icon: CalendarCheck2, gradient: 'from-emerald-400 to-teal-500' },
                     { label: 'Scheduled Classes', value: String(data.totalSchedules || 0), icon: BarChart3, gradient: 'from-amber-400 to-orange-500' },
                 ]);
-                if (data.utilizationPercent) setUtilizationPercent(data.utilizationPercent);
-                if (data.deptWorkload) setDeptWorkload(data.deptWorkload);
             } catch (e) { console.error(e); }
             finally { setIsLoading(false); }
         })();
     }, []);
 
-    const chartOpts = {
-        responsive: true,
-        plugins: {
-            legend: { position: 'top', labels: { color: 'rgba(179,232,240,0.6)', font: { size: 11 } } },
-        },
-        scales: {
-            y: { beginAtZero: true, ticks: { color: 'rgba(179,232,240,0.4)' }, grid: { color: 'rgba(0,178,203,0.06)' } },
-            x: { ticks: { color: 'rgba(179,232,240,0.4)' }, grid: { color: 'rgba(0,178,203,0.06)' } }
-        }
-    };
-
-    const utilizationData = {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-        datasets: [{
-            label: 'Room Utilization %',
-            data: utilizationPercent,
-            backgroundColor: 'rgba(0, 178, 203, 0.4)',
-            borderColor: 'rgba(0, 178, 203, 0.8)',
-            borderWidth: 2, borderRadius: 6,
-        }],
-    };
-
-    const wLabels = Object.keys(deptWorkload);
-    const wValues = Object.values(deptWorkload);
-    const workloadData = {
-        labels: wLabels.length ? wLabels : ['No Data'],
-        datasets: [{
-            label: 'Dept Workload (hrs)',
-            data: wValues.length ? wValues : [0],
-            borderColor: 'rgba(168,85,247,0.8)',
-            backgroundColor: 'rgba(168,85,247,0.1)',
-            borderWidth: 2, fill: true, tension: 0.4,
-            pointBackgroundColor: 'rgba(168,85,247,1)',
-        }]
-    };
 
     return (
         <div className="space-y-6 fade-in overflow-x-hidden">
@@ -127,20 +84,6 @@ export default function AdminDashboard() {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ScrollReveal direction="left" delay={0.2}>
-                    <div className="glass-card rounded-2xl p-6">
-                        <h3 className="text-base font-bold text-white mb-4">Classroom Utilization</h3>
-                        <div className="h-56"><Bar options={chartOpts} data={utilizationData} /></div>
-                    </div>
-                </ScrollReveal>
-                <ScrollReveal direction="right" delay={0.3}>
-                    <div className="glass-card rounded-2xl p-6">
-                        <h3 className="text-base font-bold text-white mb-4">Department Workload</h3>
-                        <div className="h-56"><Line options={chartOpts} data={workloadData} /></div>
-                    </div>
-                </ScrollReveal>
-            </div>
 
             {/* Recent Activity and Quick Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

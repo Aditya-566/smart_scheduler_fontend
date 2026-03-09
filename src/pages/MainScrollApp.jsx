@@ -11,7 +11,7 @@ import FacultyCourses from './FacultyCourses';
 import Settings from './Settings';
 
 const Section = ({ id, children }) => (
-    <section id={id} className="pt-8 pb-16 outline-none w-full relative" tabIndex="-1">
+    <section id={id} className="pb-16 outline-none w-full relative" tabIndex="-1">
         {children}
     </section>
 );

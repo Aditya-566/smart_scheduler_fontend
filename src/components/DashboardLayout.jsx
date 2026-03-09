@@ -162,7 +162,7 @@ export default function DashboardLayout({ children }) {
                 </header>
 
                 {/* Content area */}
-                <div id="main-scroll-container" className="flex-1 overflow-auto p-6 md:p-8 relative">
+                <div id="main-scroll-container" className="flex-1 overflow-auto px-6 md:px-8 pb-6 md:pb-8 pt-4 relative">
                     {children}
                 </div>
             </main>

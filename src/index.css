@@ -81,16 +81,16 @@ body {
 
 .glass-card {
   background: #071529;
-  border: 1px solid rgba(0, 178, 203, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.02);
   border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
-  border-color: rgba(0, 178, 203, 0.3);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  transform: translateY(-2px);
+  border-color: rgba(0, 178, 203, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 178, 203, 0.05);
+  transform: translateY(-4px) scale(1.01);
 }
 
 /* ============= BUTTONS ============= */
