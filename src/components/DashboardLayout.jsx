@@ -38,7 +38,7 @@ export default function DashboardLayout({ children }) {
     const allowedNavItems = navItems.filter(item => item.roles.includes(user?.role));
 
     return (
-        <div className="min-h-screen flex relative">
+        <div className="h-screen overflow-hidden flex relative">
             <OceanBackground />
 
             {/* Sidebar */}

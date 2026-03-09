@@ -11,7 +11,7 @@ import FacultyCourses from './FacultyCourses';
 import Settings from './Settings';
 
 const Section = ({ id, children }) => (
-    <section id={id} className="min-h-screen pt-24 pb-12 outline-none w-full" tabIndex="-1">
+    <section id={id} className="min-h-screen py-20 border-b border-ocean-500/10 outline-none w-full relative" tabIndex="-1">
         {children}
     </section>
 );
@@ -23,7 +23,7 @@ export default function MainScrollApp() {
 
     return (
         <DashboardLayout>
-            <div className="space-y-12">
+            <div className="flex flex-col w-full">
                 <Section id="dashboard-overview">
                     {user.role === 'ADMIN' && <AdminDashboard />}
                     {user.role === 'FACULTY' && <FacultyDashboard />}
