@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-scroll';
+import { Link, scroller } from 'react-scroll';
 import { useAuthStore } from '../store/useAuthStore';
 import OceanBackground from './OceanBackground';
 import {
@@ -75,7 +75,15 @@ export default function DashboardLayout({ children }) {
                             duration={600}
                             containerId="main-scroll-container"
                             activeClass="bg-gradient-to-r from-ocean-500/20 to-ocean-600/10 text-ocean-300 border border-ocean-500/20 !opacity-100"
-                            onClick={() => setMobileMenuOpen(false)}
+                            onClick={() => {
+                                setMobileMenuOpen(false);
+                                scroller.scrollTo(item.id, {
+                                    smooth: true,
+                                    offset: -80,
+                                    duration: 600,
+                                    containerId: "main-scroll-container"
+                                });
+                            }}
                             className="nav-item-3d flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group text-ocean-200/50 hover:text-ocean-200 hover:bg-ocean-500/5 cursor-pointer border border-transparent"
                         >
                             <item.icon className="h-5 w-5 transition-transform group-hover:scale-110" />
@@ -134,7 +142,7 @@ export default function DashboardLayout({ children }) {
                 </header>
 
                 {/* Content area */}
-                <div id="main-scroll-container" className="flex-1 overflow-auto p-6 md:p-8">
+                <div id="main-scroll-container" className="flex-1 overflow-auto p-6 md:p-8 relative">
                     {children}
                 </div>
             </main>
