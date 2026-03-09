@@ -88,26 +88,46 @@ export default function Courses() {
                 ) : filtered.length === 0 ? (
                     <div className="p-8 text-center text-ocean-200/40"><p>No courses found.</p></div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="ocean-table">
-                            <thead><tr><th>Code</th><th>Name</th><th>Credits</th><th>Department</th><th>Faculty</th><th className="text-right">Actions</th></tr></thead>
-                            <tbody>
-                                {filtered.map(c => (
-                                    <tr key={c._id}>
-                                        <td className="font-semibold text-ocean-200">{c.code}</td>
-                                        <td className="font-medium text-white">{c.name}</td>
-                                        <td><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-ocean-500/15 text-ocean-300 text-xs font-bold">{c.credits}</span></td>
-                                        <td><span className="px-2 py-0.5 rounded-md text-xs font-medium bg-ocean-500/10 text-ocean-300 border border-ocean-500/15">{c.department?.name || c.department}</span></td>
-                                        <td>{c.faculty ? <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-purple-500/10 text-purple-300 border border-purple-500/15">{c.faculty.name || c.faculty}</span>
-                                            : <span className="text-xs text-ocean-200/30 italic">Not assigned</span>}</td>
-                                        <td className="flex justify-end gap-1">
-                                            <button onClick={() => openEdit(c)} className="p-2 text-ocean-300/40 hover:text-ocean-300 hover:bg-ocean-500/10 rounded-lg transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                            <button onClick={() => handleDelete(c._id)} className="p-2 text-ocean-300/40 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-4">
+                        {filtered.map(c => (
+                            <div key={c._id} className="glass-card rounded-2xl overflow-hidden group flex flex-col shadow-lg border border-ocean-500/20">
+                                <div className="h-32 w-full relative overflow-hidden bg-ocean-900/50">
+                                    <img 
+                                        src={`https://picsum.photos/seed/${c._id}/400/200`} 
+                                        alt={c.name}
+                                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-deep-900 via-deep-900/50 to-transparent"></div>
+                                    <div className="absolute bottom-3 left-4 right-4 flex justify-between items-end">
+                                        <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-ocean-500/80 text-white backdrop-blur-md shadow-lg border border-ocean-400/30">
+                                            {c.code}
+                                        </span>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => openEdit(c)} className="p-1.5 text-white/70 hover:text-white bg-black/40 hover:bg-ocean-500/60 backdrop-blur-md rounded-lg transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
+                                            <button onClick={() => handleDelete(c._id)} className="p-1.5 text-white/70 hover:text-red-100 bg-black/40 hover:bg-red-500/60 backdrop-blur-md rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-5 flex flex-col flex-1 bg-deep-900/40">
+                                    <h3 className="font-bold text-lg text-white mb-4 leading-tight">{c.name}</h3>
+                                    
+                                    <div className="mt-auto space-y-2.5 pt-2">
+                                        <div className="flex items-center text-sm">
+                                            <BookOpen className="w-4 h-4 text-ocean-400 mr-2.5 flex-shrink-0" />
+                                            <span className="text-ocean-100/70">Credits: <span className="text-white font-medium">{c.credits}</span></span>
+                                        </div>
+                                        <div className="flex items-center text-sm">
+                                            <UsersIcon className="w-4 h-4 text-purple-400 mr-2.5 flex-shrink-0" />
+                                            <span className="text-ocean-100/70 truncate">Dept: <span className="text-white font-medium">{c.department?.name || c.department}</span></span>
+                                        </div>
+                                        <div className="flex items-center text-sm">
+                                            <Clock className="w-4 h-4 text-emerald-400 mr-2.5 flex-shrink-0" />
+                                            <span className="text-ocean-100/70 truncate">Faculty: {c.faculty ? <span className="text-white font-medium">{c.faculty.name || c.faculty}</span> : <span className="text-ocean-100/40 italic">Not assigned</span>}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
             </div>

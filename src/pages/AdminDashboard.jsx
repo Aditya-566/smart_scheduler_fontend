@@ -108,13 +108,19 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((s, i) => (
                     <ScrollReveal key={i} direction="up" delay={i * 0.1}>
-                        <div className="glass-card stat-card-3d rounded-2xl p-5 flex items-center gap-4">
-                            <div className={`bg-gradient-to-br ${s.gradient} p-3.5 rounded-xl text-white icon-3d`}>
-                                <s.icon className="h-5 w-5" />
+                        <div className="glass-card rounded-2xl p-5 flex flex-col gap-4 relative overflow-hidden group">
+                            <div className="flex items-center gap-4">
+                                <div className={`bg-gradient-to-br ${s.gradient} p-3.5 rounded-xl text-white`}>
+                                    <s.icon className="h-5 w-5" />
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-xs font-medium text-ocean-200/60 mb-1">{s.label}</p>
+                                    <h3 className="text-2xl font-bold text-white">{isLoading ? '...' : s.value}</h3>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-xs font-medium text-ocean-200/50">{s.label}</p>
-                                <p className="text-2xl font-bold text-white">{isLoading ? '...' : s.value}</p>
+                            {/* Decorative Activity Sparkle */}
+                            <div className="w-full h-1 bg-deep-800 rounded-full overflow-hidden mt-1">
+                                <div className={`h-full bg-gradient-to-r ${s.gradient} opacity-70 w-2/3 group-hover:w-full transition-all duration-1000`}></div>
                             </div>
                         </div>
                     </ScrollReveal>
@@ -136,27 +142,62 @@ export default function AdminDashboard() {
                 </ScrollReveal>
             </div>
 
-            <ScrollReveal direction="up" delay={0.4}>
-                <div className="glass-card rounded-2xl p-6">
-                <h3 className="text-base font-bold text-white mb-4">Quick Actions</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {[
-                        { label: 'Generate Schedule', action: openModal, color: 'ocean' },
-                        { label: 'Add New Course', action: () => scroller.scrollTo('courses', { smooth: true, offset: -80, duration: 600, containerId: 'main-scroll-container' }), color: 'purple' },
-                        { label: 'Manage Classrooms', action: () => scroller.scrollTo('rooms', { smooth: true, offset: -80, duration: 600, containerId: 'main-scroll-container' }), color: 'emerald' }
-                    ].map((btn, i) => (
-                        <button key={i} onClick={btn.action}
-                            className={`py-4 px-5 rounded-xl font-medium text-left flex justify-between items-center group
-                            bg-${btn.color === 'ocean' ? 'ocean' : btn.color}-500/10 text-${btn.color === 'ocean' ? 'ocean' : btn.color}-300
-                            hover:bg-${btn.color === 'ocean' ? 'ocean' : btn.color}-500/20 border border-${btn.color === 'ocean' ? 'ocean' : btn.color}-500/10
-                            hover:border-${btn.color === 'ocean' ? 'ocean' : btn.color}-500/20 transition-all duration-300`}>
-                            <span className="text-sm">{btn.label}</span>
-                            <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
-                        </button>
-                    ))}
+            {/* Recent Activity and Quick Actions */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <div className="lg:col-span-2">
+                    <ScrollReveal direction="up" delay={0.4}>
+                        <div className="glass-card rounded-2xl p-6 h-full">
+                            <h3 className="text-base font-bold text-white mb-5 flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse"></div>
+                                System Activity Feed
+                            </h3>
+                            <div className="space-y-4">
+                                {[
+                                    { msg: "System scheduled 17 new classes for Computer Science.", time: "10 mins ago", color: "ocean" },
+                                    { msg: "Dr. Smith updated requirements for CS201.", time: "2 hours ago", color: "purple" },
+                                    { msg: "Room 301 features upgraded to include Smart Board.", time: "5 hours ago", color: "emerald" },
+                                    { msg: "Admin user configuration modified.", time: "1 day ago", color: "amber" }
+                                ].map((act, i) => (
+                                    <div key={i} className={`flex items-start gap-4 p-3 rounded-xl bg-${act.color}-500/5 border border-${act.color}-500/10`}>
+                                        <div className={`mt-1 p-1.5 rounded-lg bg-${act.color}-500/20 text-${act.color}-400`}>
+                                            <CalendarCheck2 className="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-ocean-50">{act.msg}</p>
+                                            <p className="text-xs text-ocean-200/40 mt-1">{act.time}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </ScrollReveal>
+                </div>
+
+                <div className="lg:col-span-1">
+                    <ScrollReveal direction="up" delay={0.5}>
+                        <div className="glass-card rounded-2xl p-6 h-full flex flex-col">
+                            <h3 className="text-base font-bold text-white mb-4">Quick Actions</h3>
+                            <div className="flex flex-col gap-3 flex-1 justify-center">
+                                {[
+                                    { label: 'Generate Schedule', action: openModal, color: 'ocean' },
+                                    { label: 'Add New Course', action: () => scroller.scrollTo('courses', { smooth: true, offset: -80, duration: 600, containerId: 'main-scroll-container' }), color: 'purple' },
+                                    { label: 'Manage Classrooms', action: () => scroller.scrollTo('rooms', { smooth: true, offset: -80, duration: 600, containerId: 'main-scroll-container' }), color: 'emerald' }
+                                ].map((btn, i) => (
+                                    <button key={i} onClick={btn.action}
+                                        className={`py-3.5 px-5 rounded-xl font-medium text-left flex justify-between items-center group
+                                        bg-${btn.color === 'ocean' ? 'ocean' : btn.color}-500/10 text-${btn.color === 'ocean' ? 'ocean' : btn.color}-300
+                                        hover:bg-${btn.color === 'ocean' ? 'ocean' : btn.color}-500/20 border border-${btn.color === 'ocean' ? 'ocean' : btn.color}-500/10
+                                        hover:border-${btn.color === 'ocean' ? 'ocean' : btn.color}-500/30 transition-all duration-300`}>
+                                        <span className="text-sm">{btn.label}</span>
+                                        <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </ScrollReveal>
                 </div>
             </div>
-            </ScrollReveal>
 
             {showModal && (
                 <div className="modal-overlay">

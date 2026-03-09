@@ -12,14 +12,21 @@ import {
     LogOut,
     Waves,
     Menu,
-    X
+    X,
+    Clock
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function DashboardLayout({ children }) {
     const { user, logout } = useAuthStore();
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
 
     const handleLogout = () => {
         logout();
@@ -51,8 +58,8 @@ export default function DashboardLayout({ children }) {
                 {/* Logo */}
                 <div className="h-18 flex items-center px-6 border-b border-ocean-500/10">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center icon-3d">
-                            <Waves className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 rounded-xl bg-ocean-500/20 flex items-center justify-center border border-ocean-500/30">
+                            <Waves className="w-5 h-5 text-ocean-300" />
                         </div>
                         <div>
                             <h1 className="text-lg font-bold text-white tracking-wide">
@@ -95,9 +102,11 @@ export default function DashboardLayout({ children }) {
                 {/* User section */}
                 <div className="p-4 border-t border-ocean-500/10">
                     <div className="flex items-center gap-3 px-3 py-2 mb-3">
-                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center text-white font-bold text-sm icon-3d">
-                            {user?.name?.charAt(0).toUpperCase()}
-                        </div>
+                        <img 
+                            src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.name}&backgroundColor=00b2cb&textColor=ffffff`} 
+                            alt="Avatar" 
+                            className="w-9 h-9 rounded-lg border border-ocean-500/30"
+                        />
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
                             <p className="text-xs text-ocean-300/40 truncate">{user?.role}</p>
@@ -130,13 +139,24 @@ export default function DashboardLayout({ children }) {
                             {user?.role?.toLowerCase()} Portal
                         </h2>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <div className="text-right hidden sm:block">
-                            <p className="text-sm font-bold text-white">{user?.name}</p>
-                            <p className="text-xs text-ocean-300/40">{user?.email}</p>
+                    <div className="flex items-center gap-6">
+                        {/* Live Clock */}
+                        <div className="hidden md:flex items-center gap-2 text-ocean-200/60 text-sm">
+                            <Clock className="w-4 h-4" />
+                            <span>{currentTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                            <span className="font-mono">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
-                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center text-white font-bold text-sm icon-3d">
-                            {user?.name?.charAt(0).toUpperCase()}
+                        
+                        <div className="flex items-center gap-3 pl-6 border-l border-ocean-500/10">
+                            <div className="text-right hidden sm:block">
+                                <p className="text-sm font-bold text-white">{user?.name}</p>
+                                <p className="text-xs text-ocean-300/40">{user?.email}</p>
+                            </div>
+                            <img 
+                                src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.name}&backgroundColor=00b2cb&textColor=ffffff`} 
+                                alt="Avatar" 
+                                className="w-9 h-9 rounded-lg border border-ocean-500/30"
+                            />
                         </div>
                     </div>
                 </header>
